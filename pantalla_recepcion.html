@@ -79,9 +79,7 @@
         .calc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .btn-calc { padding: 16px; font-size: 22px; font-weight: bold; background: #333; color: white; border: none; border-radius: 4px; }
 
-        /* ==========================================================
-           SOPORTE DE IMPRESIÓN SEGURO PARA DISPOSITIVOS MÓVILES (Chrome Android)
-           ========================================================== */
+        /* SOPORTE DE IMPRESIÓN SEGURO PARA DISPOSITIVOS MÓVILES (Chrome Android) */
         #zona-impresion-a4-real { display: none; }
 
         @media print {
@@ -329,17 +327,23 @@
     <div id="zona-impresion-a4-real"></div>
 
     <script>
- let maestroArticulos = {}; 
+        let maestroArticulos = {}; 
 
         async function conectarBaseDeDatos() {
             try {
-                // RUTA INTERNACIONAL SEGURA VÍA NGROK
-                const respuesta = await fetch('https://equate-dig-finless.ngrok-free.dev/api/articulos');
+                // SE AGREGA EL HEADER PARA SALTAR LA PANTALLA AZUL DE NGROK
+                const respuesta = await fetch('https://equate-dig-finless.ngrok-free.dev/api/articulos', {
+                    headers: {
+                        'ngrok-skip-browser-warning': 'true'
+                    }
+                });
+                
                 if (!respuesta.ok) throw new Error("Rechazado");
                 maestroArticulos = await respuesta.json();
                 console.log("✅ Conectado al motor WMS con éxito");
             } catch (error) {
                 console.error("❌ Error de conexión:", error);
+                alert("⚠️ Atención: No se pudo conectar con el motor WMS.");
             }
         }
 
@@ -553,3 +557,6 @@
                 btn.innerHTML = "🖨️ IMPRIMIR CARTELES"; btn.style.pointerEvents = "auto";
             }, 1000);
         }
+    </script>
+</body>
+</html>
