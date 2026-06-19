@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP WMS - ZONA DE RECEPCIÓN</title>
+    <style>
+        /* CSS CORPORATIVO: 100% PANTALLA DINÁMICA */
+        html, body {
+            background-color: #121212; color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0; width: 100%; 
+            height: 100vh; height: 100dvh; 
+            overflow: hidden; user-select: none;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        #app-container { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; }
+
+        .pantalla-modulo { display: none; height: 100%; flex-direction: column; }
+        .pantalla-modulo.activa { display: flex; }
+
+        .header {
+            background-color: #00509E; padding: 12px; text-align: left; 
+            font-size: 16px; font-weight: bold; border-radius: 6px; 
+            text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 4px 0 #003366; color: #ffffff;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+        }
+        .btn-escape {
+            background-color: #b71c1c; color: #ffffff; border: none; padding: 8px 12px;
+            font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer;
+            box-shadow: 0 3px 0 #5f0909; text-transform: uppercase;
+        }
+        .btn-escape:active { transform: translateY(2px); box-shadow: 0 1px 0 #5f0909; }
+        .btn-rojo { background-color: #b71c1c; color: white; }
+
+        .bloque-contenido { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding-bottom: 5px; overflow-y: auto; }
+
+        .seccion { background-color: #1e1e1e; border: 1px solid #333; padding: 10px 12px; border-radius: 6px; margin-bottom: 10px; }
+        .titulo-seccion { color: #ffffff; font-size: 13px; border-bottom: 1px solid #4CAF50; padding-bottom: 4px; margin-bottom: 6px; font-weight: bold; text-transform: uppercase; }
+        .etiqueta { color: #aaaaaa; font-size: 10px; text-transform: uppercase; display: block; margin-bottom: 2px; margin-top: 4px; font-weight: bold; }
+        
+        select { width: 100%; padding: 10px; font-size: 15px; background-color: #0a0a0a; color: #ffffff; border: 1px solid #444; border-radius: 6px; box-sizing: border-box; cursor: pointer; }
+        
+        .btn-3d { padding: 12px; font-size: 13px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 0 #000; transform: translateY(-2px); text-align: center; box-sizing: border-box; }
+        .btn-3d:active { box-shadow: 0 1px 0 #000; transform: translateY(2px); }
+        .btn-mini { width: 45px; height: 42px; font-size: 24px; background-color: #333; color: white; border: 1px solid #444; padding:0;}
+        .btn-bloque { width: 100%; margin-top: 8px; }
+        .btn-gris-topo { background-color: #4b4b4b; color: white; }
+        .btn-verde-exito { background-color: #2e7d32; color: white; }
+        .btn-naranja { background-color: #ef6c00; color: white; box-shadow: 0 4px 0 #b24b00; }
+
+        .grupo-botones-inline { display: flex; gap: 6px; margin-top: 2px; margin-bottom: 4px; width: 100%; }
+        .btn-opcion-inline { flex: 1; padding: 10px 2px; background-color: #252525; color: #cccccc; border: 1px solid #444; font-size: 10px; font-weight: bold; border-radius: 4px; box-shadow: 0 3px 0 #000; transform: translateY(-2px); text-align: center; text-transform: uppercase; }
+        .btn-opcion-inline.activo { background-color: #2e7d32 !important; color: white !important; border: 1px solid #4caf50 !important; transform: translateY(2px) !important; box-shadow: none !important; }
+
+        .contador-contenedor { display: flex; align-items: center; justify-content: space-between; background: #0a0a0a; border: 1px solid #444; border-radius: 6px; padding: 6px; }
+        .numero-verde { color: #4CAF50; font-weight: bold; text-align: center; }
+        .contador-valor { flex: 1; font-size: 24px; }
+
+        .slider-bloque-completo { display: flex; align-items: center; gap: 10px; background-color: #0a0a0a; padding: 8px; border-radius: 6px; border: 1px solid #444; width: 100%; box-sizing: border-box; }
+        .slider-numero-grande { font-size: 28px; min-width: 40px; }
+        .slider-linea-extendida { flex: 1; -webkit-appearance: none; appearance: none; height: 8px; border-radius: 4px; background: #333; outline: none; border: 1px solid #222; }
+        .slider-linea-extendida::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 32px; height: 32px; border-radius: 50%; background: #4CAF50; border: 2px solid #ffffff; }
+
+        .cronometro-box-unico { background: #0a0a0a; padding: 10px; border-radius: 6px; border: 1px solid #333; text-align: center; font-family: monospace; font-size: 20px; margin-bottom: 10px; }
+
+        .item-pool-fila { background: #252525; padding: 12px; border-radius: 6px; margin-bottom: 8px; border-left: 5px solid #4CAF50; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 0 #000; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; background-color: #0a0a0a; }
+        th, td { border: 1px solid #333; padding: 10px; text-align: left; font-size: 13px; }
+        th { background-color: #151515; color: #ffffff; font-size: 11px; text-transform: uppercase; }
+
+        .calc-pantalla-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; }
+        .calc-cuerpo { background: #1e1e1e; border: 1px solid #444; border-radius: 8px; padding: 15px; width: 300px; position: relative; }
+        .btn-escape-calc { position: absolute; top: 12px; right: 12px; }
+        .calc-display { background: #0a0a0a; color: #4CAF50; font-size: 32px; text-align: right; padding: 10px; border-radius: 4px; margin-top: 30px; margin-bottom: 12px; font-family: monospace; border: 1px solid #333; }
+        .calc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .btn-calc { padding: 16px; font-size: 22px; font-weight: bold; background: #333; color: white; border: none; border-radius: 4px; }
+
+        /* ==========================================================
+           SOPORTE DE IMPRESIÓN SEGURO PARA DISPOSITIVOS MÓVILES (Chrome Android)
+           ========================================================== */
+        #zona-impresion-a4-real { display: none; }
+
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 0mm;
+            }
+            html, body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                width: 297mm !important;
+                height: 210mm !important;
+                overflow: visible !important;
+            }
+            #app-container, .calc-pantalla-overlay, .header, button {
+                display: none !important;
+            }
+            #zona-impresion-a4-real {
+                display: block !important;
+                width: 297mm !important;
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .hoja-a4-fluida {
+                width: 297mm !important;
+                height: 210mm !important;
+                padding: 10mm !important;
+                box-sizing: border-box !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                background: #ffffff !important;
+                display: block !important;
+                position: relative !important;
+            }
+            .titulo-print {
+                text-align: center !important;
+                font-size: 18pt !important;
+                font-weight: bold !important;
+                border-bottom: 3px solid #000000 !important;
+                margin-bottom: 5mm !important;
+                padding-bottom: 2mm !important;
+                color: #000000 !important;
+                text-transform: uppercase !important;
+            }
+            .print-slot {
+                height: 42mm !important;
+                border: 2px solid #000000 !important;
+                margin-bottom: 4mm !important;
+                padding: 4mm !important;
+                box-sizing: border-box !important;
+                display: block !important;
+                background: #ffffff !important;
+            }
+            .print-slot-top {
+                display: block !important;
+                width: 100% !important;
+                margin-bottom: 2mm !important;
+            }
+            .print-texto-sku {
+                font-size: 28pt !important;
+                font-weight: 900 !important;
+                float: left !important;
+                color: #000000 !important;
+                font-family: sans-serif !important;
+            }
+            .print-texto-cant {
+                font-size: 28pt !important;
+                font-weight: 900 !important;
+                float: right !important;
+                color: #000000 !important;
+                font-family: sans-serif !important;
+            }
+            .limpiar-float {
+                clear: both !important;
+            }
+            .print-slot-bottom {
+                border-top: 1px dashed #000000 !important;
+                padding-top: 2mm !important;
+                margin-top: 1mm !important;
+                display: block !important;
+            }
+            .print-texto-chico {
+                font-size: 11pt !important;
+                font-weight: bold !important;
+                float: left !important;
+                color: #000000 !important;
+                font-family: sans-serif !important;
+                max-width: 70% !important;
+            }
+            .print-qr-chico {
+                float: right !important;
+                margin-top: -4mm !important;
+            }
+            .print-qr-chico img {
+                width: 20mm !important;
+                height: 20mm !important;
+                display: block !important;
+            }
+            .print-maestro-box {
+                border: 2px solid #000000 !important;
+                padding: 3px !important;
+                position: absolute !important;
+                bottom: 10mm !important;
+                right: 10mm !important;
+                background: #ffffff !important;
+                width: 80mm !important;
+                height: 32mm !important;
+            }
+            .print-maestro-texto {
+                font-size: 12pt !important;
+                font-weight: bold !important;
+                float: left !important;
+                margin-top: 10mm !important;
+                margin-left: 2mm !important;
+                color: #000000 !important;
+            }
+            .print-qr-maestro {
+                float: right !important;
+            }
+            .print-qr-maestro img {
+                width: 28mm !important;
+                height: 28mm !important;
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+
+        <div id="pantalla-cero" class="pantalla-modulo activa" style="justify-content: center;">
+            <button class="btn-3d btn-verde-exito" style="width:100%; height:35vh; font-size:32px; border-radius:15px; box-shadow: 0 10px 0 #1b5e20;" onclick="iniciarArriboCamion()">
+                Comenzar Recepción
+            </button>
+        </div>
+
+        <div id="pantalla-ingreso" class="pantalla-modulo">
+            <div class="header">
+                <span>ZONA DE RECEPCIÓN</span>
+                <button class="btn-escape" onclick="volverMenuPrincipal()">🔙 SALIR</button>
+            </div>
+            
+            <div class="bloque-contenido">
+                <div class="cronometro-box-unico numero-verde" id="reloj-unico">⏱️ TIEMPO: <span id="time-global">00:00</span></div>
+
+                <div class="seccion" style="padding-bottom: 5px;">
+                    <div class="titulo-seccion">1. Control Operativo</div>
+                    <select id="resp_recepcion">
+                        <option value="">-- RESPONSABLE DE ZONA --</option>
+                        <option value="Marcos">Marcos</option>
+                        <option value="Claudio">Claudio</option>
+                        <option value="Facundo">Facundo</option>
+                    </select>
+                    <span class="etiqueta">Cantidad de Ayudantes</span>
+                    <div class="contador-contenedor"><button class="btn-3d btn-mini" onclick="cambiarAyudantes(-1)">-</button><span class="contador-valor numero-verde" id="lbl_ayudantes">0</span><button class="btn-3d btn-mini" onclick="cambiarAyudantes(1)">+</button></div>
+                </div>
+
+                <div class="seccion" style="padding-bottom: 5px;">
+                    <div class="titulo-seccion">2. Clasificación de Carga</div>
+                    <div class="grupo-botones-inline" id="box-transporte"><button class="btn-opcion-inline" onclick="clickBotonInline('box-transporte', this)">Camión</button><button class="btn-opcion-inline" onclick="clickBotonInline('box-transporte', this)">Contenedor</button><button class="btn-opcion-inline" onclick="clickBotonInline('box-transporte', this)">Camioneta</button><button class="btn-opcion-inline" onclick="clickBotonInline('box-transporte', this)">Furgón</button></div>
+                    <div class="grupo-botones-inline" id="box-carga"><button class="btn-opcion-inline" onclick="clickBotonInline('box-carga', this)">Pallets</button><button class="btn-opcion-inline" onclick="clickBotonInline('box-carga', this)">A Granel</button><button class="btn-opcion-inline" onclick="clickBotonInline('box-carga', this)">Mixto</button><button class="btn-opcion-inline" onclick="clickBotonInline('box-carga', this)">Bultos</button></div>
+                    <span class="etiqueta">Cant. Pallets Declarados</span>
+                    <div class="slider-bloque-completo"><div class="slider-numero-grande numero-verde" id="display-pallets">1</div><button class="btn-3d btn-mini" onclick="ajustarSlider(-1)">-</button><input type="range" id="barra-pallets" class="slider-linea-extendida" min="1" max="70" value="1" step="1" oninput="moverSliderLogico(this.value)"><button class="btn-3d btn-mini" onclick="ajustarSlider(1)">+</button></div>
+                </div>
+
+                <div class="seccion" id="bloque-documental" style="margin-bottom:0; padding-bottom: 12px;">
+                    <div class="titulo-seccion">3. Documentación Real</div>
+                    
+                    <div id="caja-botones-doc" style="display:flex; flex-direction:column; gap:8px;">
+                        <div style="display:flex; gap:8px;">
+                            <label for="file-remito" class="btn-3d btn-verde-exito" style="flex:1; padding:15px 2px; background-color:#00509E; box-shadow:0 4px 0 #002244;">📸 FOTO REMITO</label>
+                            <input type="file" id="file-remito" accept="image/*" capture="environment" style="display:none;" onchange="procesarFotoRemitoIA()">
+                            
+                            <button class="btn-3d btn-gris-topo" style="flex:1; padding:15px 2px;" onclick="mostrarCajaManual()">✏️ INGRESO MANUAL</button>
+                        </div>
+                        <button class="btn-3d btn-naranja" style="width:100%; padding:15px 2px;" onclick="desbloquearRecepcionSinOC()">🚫 REMITO SIN ORDEN DE COMPRA</button>
+                    </div>
+                    
+                    <div id="box-oc-falla" style="display:none; gap:8px;">
+                        <input type="number" id="txt-oc-manual" style="flex:2; padding:12px; background:#1e1e1e; color:#4CAF50; font-weight:bold; font-size:16px; border:1px solid #555; border-radius:4px;" placeholder="OC (Ej: 1234)">
+                        <button class="btn-3d btn-gris-topo" style="flex:1; font-size:12px;" onclick="buscarOCManualDigitada()">VALIDAR</button>
+                        <button class="btn-3d btn-rojo" style="width:40px; font-size:14px;" onclick="ocultarCajaManual()">X</button>
+                    </div>
+                    
+                    <div id="txt-ocr-status" style="text-align:center; font-weight:bold; margin-top:8px; color:#aaa; font-size:12px; display:none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pantalla-pallet-building" class="pantalla-modulo">
+            <div class="header"><span>CONSOLIDACIÓN</span><button class="btn-escape" onclick="volverMenuPrincipal()">🔙 SALIR</button></div>
+            <div class="bloque-contenido" style="justify-content: flex-start;">
+                <div class="seccion"><div class="titulo-seccion">Artículos en la Base SQL (Toque para asignar cantidad)</div><div id="contenedor-pool-articulos"></div></div>
+                <div class="seccion" style="background:#0a0a0a; border:1px dashed #555;">
+                    <div class="titulo-seccion" id="titulo-pallet-actual" style="border-color:#555;">CONSTRUYENDO PALLET N° 1</div>
+                    <table id="tabla-pallet-activo"><thead><tr><th>Artículo</th><th>Cant.</th></tr></thead><tbody id="cuerpo-pallet-activo"></tbody></table>
+                    <div style="display:flex; gap:10px; margin-top:15px;"><button class="btn-3d btn-gris-topo" style="flex:1;" onclick="cerrarPalletYSiguiente()">📦 Sig. Pallet</button><button class="btn-3d btn-verde-exito" style="flex:1;" onclick="irAVisualizarControl()">👁️ Resumen</button></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pantalla-resumen" class="pantalla-modulo">
+            <div class="header"><span>CIERRE RECEPCIÓN</span><button class="btn-escape" onclick="volverAPallets()">🔙 VOLVER</button></div>
+            <div class="bloque-contenido" style="justify-content: flex-start;">
+                <div class="seccion"><div class="titulo-seccion">Resumen Estructural</div><div id="contenedor-resumen-pallets"></div></div>
+                <div id="caja-botones-cierre" style="display:flex; gap:10px; margin-top:10px;"><button class="btn-3d btn-gris-topo" style="flex:1;" onclick="irAlEditorB()">✏️ Editar</button><button class="btn-3d btn-verde-exito" style="flex:1;" onclick="iniciarFaseUnoCierre()">📧 CONFIRMAR</button></div>
+                <div id="caja-impresion-cierre" style="display:none; margin-top:10px;"><button class="btn-3d btn-bloque" id="btn-ejecutar-impresion" style="background-color:#ffffff; color:#000000; font-size:18px; padding:22px;" onclick="iniciarFaseDosImpresion()">🖨️ IMPRIMIR CARTELES</button></div>
+            </div>
+        </div>
+
+        <div id="pantalla-editor-b" class="pantalla-modulo">
+            <div class="header"><span>SELECCIÓN EDICIÓN</span><button class="btn-escape" onclick="confirmarEdicionFinalB()">🔙 VOLVER</button></div>
+            <div class="bloque-contenido" style="justify-content: flex-start;">
+                <div class="seccion"><div class="titulo-seccion">¿Qué editar?</div><div id="contenedor-selector-items-edit"></div></div>
+                <div style="display:flex; gap:10px; margin-top:10px;"><button class="btn-3d btn-rojo" id="btn-borrar-todo" style="flex:1;" onclick="borrarTodoElControl()">❌ Borrar Todo</button><button class="btn-3d btn-verde-exito" id="btn-confirmar-edicion-b" style="display:none; flex:1;" onclick="confirmarEdicionFinalB()">✅ Confirmar</button></div>
+            </div>
+        </div>
+
+        <div id="pantalla-editor-c" class="pantalla-modulo">
+            <div class="header"><span>REPARTO DE UNIDADES</span><button class="btn-escape" onclick="guardarCambiosItemC()">🔙 VOLVER</button></div>
+            <div class="bloque-contenido" style="justify-content: flex-start;">
+                <div class="seccion"><div class="titulo-seccion" id="titulo-edit-item-c">Editando Artículo</div><div id="contenedor-pallets-reparto-c"></div></div>
+                <button class="btn-3d btn-bloque btn-verde-exito" onclick="guardarCambiosItemC()">💾 Confirmar Item</button>
+            </div>
+        </div>
+    </div> 
+
+    <div class="calc-pantalla-overlay" id="calc-overlay">
+        <div class="calc-cuerpo">
+            <button class="btn-escape btn-escape-calc" onclick="cerrarOverlay('calc-overlay')">🔙 VOLVER</button>
+            <div style="color:#aaa; font-size:12px; margin-top:5px; font-weight:bold;" id="calc-titulo-contexto">INGRESE CANTIDAD</div>
+            <div class="calc-display numero-verde" id="calc-val-display">0</div>
+            <div class="calc-grid">
+                <button class="btn-calc" onclick="pressCalcNum('1')">1</button><button class="btn-calc" onclick="pressCalcNum('2')">2</button><button class="btn-calc" onclick="pressCalcNum('3')">3</button>
+                <button class="btn-calc" onclick="pressCalcNum('4')">4</button><button class="btn-calc" onclick="pressCalcNum('5')">5</button><button class="btn-calc" onclick="pressCalcNum('6')">6</button>
+                <button class="btn-calc" onclick="pressCalcNum('7')">7</button><button class="btn-calc" onclick="pressCalcNum('8')">8</button><button class="btn-calc" onclick="pressCalcNum('9')">9</button>
+                <button class="btn-calc" onclick="pressCalcClear()">C</button><button class="btn-calc" onclick="pressCalcNum('0')">0</button><button class="btn-calc btn-verde-exito" onclick="pressCalcOk()">OK</button>
+            </div>
+            <button class="btn-3d btn-bloque btn-gris-topo" style="margin-top:12px; font-size:14px; padding:12px;" id="btn-calc-todo">Asignar Todo</button>
+        </div>
+    </div>
+
+    <div id="zona-impresion-a4-real"></div>
+
+    <script>
+        let maestroArticulos = {}; 
+
+        async function conectarBaseDeDatos() {
+            try {
+                const respuesta = await fetch('http://192.168.1.46:3000/api/articulos');
+                if (!respuesta.ok) throw new Error("Rechazado");
+                maestroArticulos = await respuesta.json();
+            } catch (error) {
+                alert("⚠️ Error: El celular no encuentra el motor en 192.168.1.46:3000.");
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', conectarBaseDeDatos);
+        
+        let poolTrabajo = {}; 
+        let palletsConstruidos = []; let palletActivo = { id: 1, items: {} };
+        let tGlobal = 0; let intervalGlobal;
+        let remitoGlobal = "REMITO-REAL"; let proveedorGlobal = "GENERICO";
+        let numeroOCValidada = "1234"; let esPrimerEdicionB = true;
+        let currentCalcSku = ""; let currentCalcMode = "building"; let currentCalcPalletId = null;
+
+        function volverMenuPrincipal() { if(confirm("¿Salir?")) { location.reload(); } }
+        function formatearTiempo(seg) { let m = Math.floor(seg/60); let s = seg%60; return (m<10?"0":"")+m+":"+(s<10?"0":"")+s; }
+        
+        function iniciarArriboCamion() {
+            cambiarPantalla('pantalla-ingreso');
+            clearInterval(intervalGlobal); 
+            intervalGlobal = setInterval(() => { tGlobal++; document.getElementById('time-global').innerText = formatearTiempo(tGlobal); }, 1000);
+        }
+
+        function cambiarPantalla(id) { 
+            let mods = document.getElementsByClassName('pantalla-modulo'); 
+            for(let m of mods) { m.classList.remove('activa'); m.style.display = 'none'; }
+            let dest = document.getElementById(id); dest.classList.add('activa'); dest.style.display = 'flex';
+        }
+        
+        function cambiarAyudantes(v) { let val = parseInt(document.getElementById('lbl_ayudantes').innerText) + v; document.getElementById('lbl_ayudantes').innerText = val < 0 ? 0 : val; }
+        function clickBotonInline(id, btn) { let btns = document.getElementById(id).getElementsByClassName('btn-opcion-inline'); for(let b of btns) b.classList.remove('activo'); btn.classList.add('activo'); }
+        function moverSliderLogico(v) { document.getElementById('display-pallets').innerText = v; }
+        function ajustarSlider(c) { let barra = document.getElementById('barra-pallets'); let n = parseInt(barra.value) + c; if(n>=1 && n<=70){ barra.value=n; moverSliderLogico(n); } }
+        function cerrarOverlay(id) { document.getElementById(id).style.display = "none"; }
+
+        function procesarFotoRemitoIA() {
+            let status = document.getElementById('txt-ocr-status');
+            status.style.display = "block"; status.style.color = "#ffffff";
+            status.innerHTML = "Analizando Remito Real... ⏳";
+            setTimeout(() => {
+                remitoGlobal = "FOTO-" + Math.floor(Math.random()*10000);
+                status.innerHTML = "✅ Remito cargado por IA.";
+                poolTrabajo = {};
+                for(let sku in maestroArticulos) { poolTrabajo[sku] = 100; }
+                setTimeout(() => { iniciarDescargaFisica(); }, 1000);
+            }, 1500);
+        }
+
+        function desbloquearRecepcionSinOC() {
+            remitoGlobal = "SIN-OC-" + Math.floor(Math.random()*10000);
+            proveedorGlobal = "INGRESO EXCEPCIONAL";
+            poolTrabajo = {};
+            for(let sku in maestroArticulos) { poolTrabajo[sku] = 500; }
+            iniciarDescargaFisica();
+        }
+
+        function mostrarCajaManual() { document.getElementById('caja-botones-doc').style.display = "none"; document.getElementById('box-oc-falla').style.display = "flex"; }
+        function ocultarCajaManual() { document.getElementById('caja-botones-doc').style.display = "flex"; document.getElementById('box-oc-falla').style.display = "none"; }
+
+        function buscarOCManualDigitada() {
+            let digitos = document.getElementById('txt-oc-manual').value;
+            if(digitos !== "") { 
+                numeroOCValidada = digitos; 
+                poolTrabajo = {};
+                for(let sku in maestroArticulos) { poolTrabajo[sku] = 200; }
+                iniciarDescargaFisica(); 
+            }
+        }
+
+        function iniciarDescargaFisica() { cambiarPantalla('pantalla-pallet-building'); renderizarPool(); }
+        function volverAPallets() { cambiarPantalla('pantalla-pallet-building'); }
+
+        function renderizarPool() {
+            let c = document.getElementById('contenedor-pool-articulos'); c.innerHTML = ""; let vacio = true;
+            for(let sku in poolTrabajo) {
+                if(poolTrabajo[sku] > 0) { 
+                    vacio = false; 
+                    let descripcionReal = maestroArticulos[sku] ? maestroArticulos[sku].desc : "Artículo";
+                    c.innerHTML += `<div class="item-pool-fila" onclick="abrirCalculadora('${sku}', 'building')"><div><strong>${sku}</strong><br><small style="color:#aaa;">${descripcionReal}</small></div><div class="numero-verde">Disponibles: ${poolTrabajo[sku]}</div></div>`; 
+                }
+            }
+            if(vacio) c.innerHTML = `<div style="text-align:center; padding:15px; color:#4CAF50; font-weight:bold;">✅ Avance completado.</div>`;
+        }
+
+        function abrirCalculadora(sku, modo, pId = null) {
+            currentCalcSku = sku; currentCalcMode = modo; currentCalcPalletId = pId;
+            document.getElementById('calc-val-display').innerText = "0"; document.getElementById('calc-titulo-contexto').innerText = `ASIGNANDO: ${sku}`;
+            let btnTodo = document.getElementById('btn-calc-todo');
+            if(modo === 'building') { btnTodo.onclick = () => inyectarCant(poolTrabajo[sku]); } 
+            else { btnTodo.onclick = () => { let ya = palletsConstruidos.find(p=>p.id===pId).items[sku]||0; inyectarCant(ya + poolTrabajo[sku]); }; }
+            document.getElementById('calc-overlay').style.display = "flex";
+        }
+
+        function pressCalcNum(n) { let d = document.getElementById('calc-val-display'); d.innerText = d.innerText==="0" ? n : d.innerText+n; }
+        function pressCalcClear() { document.getElementById('calc-val-display').innerText = "0"; }
+        function pressCalcOk() { inyectarCant(parseInt(document.getElementById('calc-val-display').innerText)); }
+
+        function inyectarCant(cant) {
+            if(isNaN(cant) || cant < 0) return;
+            if(currentCalcMode === 'building') {
+                if(cant > poolTrabajo[currentCalcSku]) { alert("Excede bultos"); return; }
+                poolTrabajo[currentCalcSku] -= cant; palletActivo.items[currentCalcSku] = (palletActivo.items[currentCalcSku]||0) + cant;
+                renderizarPallet(); renderizarPool();
+            } else {
+                let pIdx = palletsConstruidos.findIndex(p=>p.id===currentCalcPalletId); let viejo = palletsConstruidos[pIdx].items[currentCalcSku]||0;
+                poolTrabajo[currentCalcSku] += viejo;
+                if(cant > poolTrabajo[currentCalcSku]) { alert("Excede total"); poolTrabajo[currentCalcSku] -= viejo; return; }
+                poolTrabajo
