@@ -333,7 +333,7 @@
 
         async function conectarBaseDeDatos() {
             try {
-                const respuesta = await fetch('http://192.168.1.46:3000/api/articulos');
+                const respuesta = await fetch('https://equate-dig-finless.ngrok-free.dev/api/articulos');
                 if (!respuesta.ok) throw new Error("Rechazado");
                 maestroArticulos = await respuesta.json();
             } catch (error) {
