@@ -377,17 +377,42 @@
         function ajustarSlider(c) { let barra = document.getElementById('barra-pallets'); let n = parseInt(barra.value) + c; if(n>=1 && n<=70){ barra.value=n; moverSliderLogico(n); } }
         function cerrarOverlay(id) { document.getElementById(id).style.display = "none"; }
 
-        function procesarFotoRemitoIA() {
+        async function procesarFotoRemitoIA() {
+            let archivoInput = document.getElementById('file-remito');
+            let foto = archivoInput.files[0];
+            if (!foto) return;
+
             let status = document.getElementById('txt-ocr-status');
             status.style.display = "block"; status.style.color = "#ffffff";
-            status.innerHTML = "Analizando Remito Real... ⏳";
-            setTimeout(() => {
-                remitoGlobal = "FOTO-" + Math.floor(Math.random()*10000);
-                status.innerHTML = "✅ Remito cargado por IA.";
-                poolTrabajo = {};
-                for(let sku in maestroArticulos) { poolTrabajo[sku] = 100; }
-                setTimeout(() => { iniciarDescargaFisica(); }, 1000);
-            }, 1500);
+            status.innerHTML = "Subiendo imagen al Motor IA... ⏳";
+
+            let formData = new FormData();
+            formData.append('foto_remito', foto);
+
+            try {
+                const respuesta = await fetch('https://equate-dig-finless.ngrok-free.dev/api/ocr', {
+                    method: 'POST',
+                    headers: { 'ngrok-skip-browser-warning': 'true' },
+                    body: formData
+                });
+
+                if (!respuesta.ok) throw new Error("El motor rechazó la imagen");
+                
+                const datosIA = await respuesta.json();
+                
+                remitoGlobal = datosIA.numero_remito || "S/N";
+                poolTrabajo = datosIA.articulos_detectados; 
+                
+                status.innerHTML = `✅ OCR Exitoso. Remito: ${remitoGlobal}`;
+                status.style.color = "#4CAF50";
+                
+                setTimeout(() => { iniciarDescargaFisica(); }, 1500);
+
+            } catch (error) {
+                console.error(error);
+                status.innerHTML = "❌ Error al leer la imagen. Ingrese manual.";
+                status.style.color = "#ff5252";
+            }
         }
 
         function desbloquearRecepcionSinOC() {
