@@ -3,584 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERP WMS - ZONA DE RECEPCIÓN</title>
+    <title>WMS Centum - Recepción Inteligente</title>
     <style>
-        /* CSS CORPORATIVO: 100% PANTALLA DINÁMICA */
-        html, body {
-            background-color: #121212; color: #e0e0e0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; padding: 0; width: 100%; 
-            height: 100vh; height: 100dvh; 
-            overflow: hidden; user-select: none;
-        }
-
-        *, *::before, *::after { box-sizing: border-box; }
-
-        #app-container { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; }
-
-        .pantalla-modulo { display: none; height: 100%; flex-direction: column; }
-        .pantalla-modulo.activa { display: flex; }
-
-        .header {
-            background-color: #00509E; padding: 12px; text-align: left; 
-            font-size: 16px; font-weight: bold; border-radius: 6px; 
-            text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 4px 0 #003366; color: #ffffff;
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
-        }
-        .btn-escape {
-            background-color: #b71c1c; color: #ffffff; border: none; padding: 8px 12px;
-            font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer;
-            box-shadow: 0 3px 0 #5f0909; text-transform: uppercase;
-        }
-        .btn-escape:active { transform: translateY(2px); box-shadow: 0 1px 0 #5f0909; }
-        .btn-rojo { background-color: #b71c1c; color: white; }
-
-        .bloque-contenido { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding-bottom: 5px; overflow-y: auto; }
-
-        .seccion { background-color: #1e1e1e; border: 1px solid #333; padding: 10px 12px; border-radius: 6px; margin-bottom: 10px; }
-        .titulo-seccion { color: #ffffff; font-size: 13px; border-bottom: 1px solid #4CAF50; padding-bottom: 4px; margin-bottom: 6px; font-weight: bold; text-transform: uppercase; }
-        .etiqueta { color: #aaaaaa; font-size: 10px; text-transform: uppercase; display: block; margin-bottom: 2px; margin-top: 4px; font-weight: bold; }
-        
-        select { width: 100%; padding: 10px; font-size: 15px; background-color: #0a0a0a; color: #ffffff; border: 1px solid #444; border-radius: 6px; box-sizing: border-box; cursor: pointer; }
-        
-        .btn-3d { padding: 12px; font-size: 13px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 0 #000; transform: translateY(-2px); text-align: center; box-sizing: border-box; }
-        .btn-3d:active { box-shadow: 0 1px 0 #000; transform: translateY(2px); }
-        .btn-mini { width: 45px; height: 42px; font-size: 24px; background-color: #333; color: white; border: 1px solid #444; padding:0;}
-        .btn-bloque { width: 100%; margin-top: 8px; }
-        .btn-gris-topo { background-color: #4b4b4b; color: white; }
-        .btn-verde-exito { background-color: #2e7d32; color: white; }
-        .btn-naranja { background-color: #ef6c00; color: white; box-shadow: 0 4px 0 #b24b00; }
-
-        .grupo-botones-inline { display: flex; gap: 6px; margin-top: 2px; margin-bottom: 4px; width: 100%; }
-        .btn-opcion-inline { flex: 1; padding: 10px 2px; background-color: #252525; color: #cccccc; border: 1px solid #444; font-size: 10px; font-weight: bold; border-radius: 4px; box-shadow: 0 3px 0 #000; transform: translateY(-2px); text-align: center; text-transform: uppercase; }
-        .btn-opcion-inline.activo { background-color: #2e7d32 !important; color: white !important; border: 1px solid #4caf50 !important; transform: translateY(2px) !important; box-shadow: none !important; }
-
-        .contador-contenedor { display: flex; align-items: center; justify-content: space-between; background: #0a0a0a; border: 1px solid #444; border-radius: 6px; padding: 6px; }
-        .numero-verde { color: #4CAF50; font-weight: bold; text-align: center; }
-        .contador-valor { flex: 1; font-size: 24px; }
-
-        .slider-bloque-completo { display: flex; align-items: center; gap: 10px; background-color: #0a0a0a; padding: 8px; border-radius: 6px; border: 1px solid #444; width: 100%; box-sizing: border-box; }
-        .slider-numero-grande { font-size: 28px; min-width: 40px; }
-        .slider-linea-extendida { flex: 1; -webkit-appearance: none; appearance: none; height: 8px; border-radius: 4px; background: #333; outline: none; border: 1px solid #222; }
-        .slider-linea-extendida::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 32px; height: 32px; border-radius: 50%; background: #4CAF50; border: 2px solid #ffffff; }
-
-        .cronometro-box-unico { background: #0a0a0a; padding: 10px; border-radius: 6px; border: 1px solid #333; text-align: center; font-family: monospace; font-size: 20px; margin-bottom: 10px; }
-
-        .item-pool-fila { background: #252525; padding: 12px; border-radius: 6px; margin-bottom: 8px; border-left: 5px solid #4CAF50; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 0 #000; }
-        table { width: 100%; border-collapse: collapse; margin-top: 8px; background-color: #0a0a0a; }
-        th, td { border: 1px solid #333; padding: 10px; text-align: left; font-size: 13px; }
-        th { background-color: #151515; color: #ffffff; font-size: 11px; text-transform: uppercase; }
-
-        .calc-pantalla-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center; }
-        .calc-cuerpo { background: #1e1e1e; border: 1px solid #444; border-radius: 8px; padding: 15px; width: 300px; position: relative; }
-        .btn-escape-calc { position: absolute; top: 12px; right: 12px; }
-        .calc-display { background: #0a0a0a; color: #4CAF50; font-size: 32px; text-align: right; padding: 10px; border-radius: 4px; margin-top: 30px; margin-bottom: 12px; font-family: monospace; border: 1px solid #333; }
-        .calc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .btn-calc { padding: 16px; font-size: 22px; font-weight: bold; background: #333; color: white; border: none; border-radius: 4px; }
-
-        /* SOPORTE DE IMPRESIÓN SEGURO PARA DISPOSITIVOS MÓVILES (Chrome Android) */
-        #zona-impresion-a4-real { display: none; }
-
-        @media print {
-            @page {
-                size: A4 landscape;
-                margin: 0mm;
-            }
-            html, body {
-                background: #ffffff !important;
-                color: #000000 !important;
-                width: 297mm !important;
-                height: 210mm !important;
-                overflow: visible !important;
-            }
-            #app-container, .calc-pantalla-overlay, .header, button {
-                display: none !important;
-            }
-            #zona-impresion-a4-real {
-                display: block !important;
-                width: 297mm !important;
-                background: #ffffff !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            .hoja-a4-fluida {
-                width: 297mm !important;
-                height: 210mm !important;
-                padding: 10mm !important;
-                box-sizing: border-box !important;
-                page-break-after: always !important;
-                page-break-inside: avoid !important;
-                background: #ffffff !important;
-                display: block !important;
-                position: relative !important;
-            }
-            .titulo-print {
-                text-align: center !important;
-                font-size: 18pt !important;
-                font-weight: bold !important;
-                border-bottom: 3px solid #000000 !important;
-                margin-bottom: 5mm !important;
-                padding-bottom: 2mm !important;
-                color: #000000 !important;
-                text-transform: uppercase !important;
-            }
-            .print-slot {
-                height: 42mm !important;
-                border: 2px solid #000000 !important;
-                margin-bottom: 4mm !important;
-                padding: 4mm !important;
-                box-sizing: border-box !important;
-                display: block !important;
-                background: #ffffff !important;
-            }
-            .print-slot-top {
-                display: block !important;
-                width: 100% !important;
-                margin-bottom: 2mm !important;
-            }
-            .print-texto-sku {
-                font-size: 28pt !important;
-                font-weight: 900 !important;
-                float: left !important;
-                color: #000000 !important;
-                font-family: sans-serif !important;
-            }
-            .print-texto-cant {
-                font-size: 28pt !important;
-                font-weight: 900 !important;
-                float: right !important;
-                color: #000000 !important;
-                font-family: sans-serif !important;
-            }
-            .limpiar-float {
-                clear: both !important;
-            }
-            .print-slot-bottom {
-                border-top: 1px dashed #000000 !important;
-                padding-top: 2mm !important;
-                margin-top: 1mm !important;
-                display: block !important;
-            }
-            .print-texto-chico {
-                font-size: 11pt !important;
-                font-weight: bold !important;
-                float: left !important;
-                color: #000000 !important;
-                font-family: sans-serif !important;
-                max-width: 70% !important;
-            }
-            .print-qr-chico {
-                float: right !important;
-                margin-top: -4mm !important;
-            }
-            .print-qr-chico img {
-                width: 20mm !important;
-                height: 20mm !important;
-                display: block !important;
-            }
-            .print-maestro-box {
-                border: 2px solid #000000 !important;
-                padding: 3px !important;
-                position: absolute !important;
-                bottom: 10mm !important;
-                right: 10mm !important;
-                background: #ffffff !important;
-                width: 80mm !important;
-                height: 32mm !important;
-            }
-            .print-maestro-texto {
-                font-size: 12pt !important;
-                font-weight: bold !important;
-                float: left !important;
-                margin-top: 10mm !important;
-                margin-left: 2mm !important;
-                color: #000000 !important;
-            }
-            .print-qr-maestro {
-                float: right !important;
-            }
-            .print-qr-maestro img {
-                width: 28mm !important;
-                height: 28mm !important;
-                display: block !important;
-            }
-        }
+        body { font-family: Arial, sans-serif; background-color: #121212; color: #ffffff; margin: 0; padding: 15px; }
+        .header { background-color: #004080; padding: 12px; text-align: center; font-weight: bold; font-size: 18px; border-radius: 5px; position: relative; margin-bottom: 15px; }
+        .btn-salir { position: absolute; right: 10px; top: 10px; background-color: #b30000; color: white; border: none; padding: 5px 10px; font-weight: bold; border-radius: 3px; cursor: pointer; }
+        .panel { background-color: #1e1e1e; border: 1px dashed #444; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
+        .panel-titulo { font-size: 13px; font-weight: bold; text-transform: uppercase; color: #bbb; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .btn-verde { background-color: #1e7e34; color: white; width: 100%; padding: 20px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
+        .btn-azul { background-color: #0056b3; color: white; width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        .preview-foto { width: 100%; max-height: 200px; object-fit: contain; margin-top: 10px; display: none; border-radius: 5px; border: 1px solid #444; }
+        .estado { background-color: #2d2d2d; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-top: 10px; font-size: 14px; }
+        .card-articulo { background-color: #252525; border-left: 5px solid #28a745; padding: 12px; margin-bottom: 10px; border-radius: 0 5px 5px 0; display: flex; justify-content: space-between; align-items: center; }
+        .card-articulo.seleccionado { background-color: #2e4a33; border-left-color: #218838; }
+        .sku { font-weight: bold; color: #28a745; font-size: 16px; }
+        .desc { font-size: 13px; color: #ccc; margin-top: 3px; }
+        .cant-stock { color: #28a745; font-weight: bold; text-align: right; font-size: 16px; }
+        .control-navegacion { display: flex; justify-content: space-between; align-items: center; background-color: #252525; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
+        .btn-nav { background-color: #444; color: white; border: none; padding: 10px 20px; font-weight: bold; font-size: 16px; border-radius: 3px; cursor: pointer; }
+        .btn-nav:disabled { background-color: #222; color: #555; cursor: not-allowed; }
+        .input-manual { width: 100%; padding: 10px; box-sizing: border-box; background-color: #2b2b2b; color: white; border: 1px solid #444; border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
+        .tabla-resumen { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .tabla-resumen th { background-color: #333; text-align: left; padding: 8px; font-size: 12px; color: #aaa; }
+        .tabla-resumen td { padding: 10px 8px; border-bottom: 1px solid #222; font-size: 14px; }
+        .badge-pallet { background-color: #ffc107; color: black; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 3px; }
     </style>
 </head>
 <body>
 
-    <div id="app-container">
+    <div id="vista-menu">
+        <div class="header">SISTEMA WMS - CENTUM</div>
+        <button class="btn-verde" onclick="cambiarPantalla('vista-recepcion')">📥 Comenzar Recepción</button>
+    </div>
 
-        <div id="pantalla-cero" class="pantalla-modulo activa" style="justify-content: center;">
-            <button class="btn-3d btn-verde-exito" style="width:100%; height:35vh; font-size:32px; border-radius:15px; box-shadow: 0 10px 0 #1b5e20;" onclick="iniciarArriboCamion()">
-                Comenzar Recepción
-            </button>
-        </div>
-
-        <div id="pantalla-ingreso" class="pantalla-modulo">
-            <div class="header">
-                <span>ZONA DE RECEPCIÓN</span>
-                <button class="btn-escape" onclick="volverMenuPrincipal()">🔙 SALIR</button>
-            </div>
-            
-            <div class="bloque-contenido">
-                <div class="cronometro-box-unico numero-verde" id="reloj-unico">⏱️ TIEMPO: <span id="time-global">00:00</span></div>
-
-                <div class="seccion" style="padding-bottom: 5px;">
-                    <div class="titulo-seccion">1. Control Operativo</div>
-                    <select id="resp_recepcion">
-                        <option value="">-- RESPONSABLE DE ZONA --</option>
-                        <option value="Marcos">Marcos</option>
-                        <option value="Claudio">Claudio</option>
-                        <option value="Facundo">Facundo</option>
-                    </select>
-                    <span class="etiqueta">Cantidad de Ayudantes</span>
-                    <div class="contador-contenedor"><button class="btn-3d btn-mini" onclick="cambiarAyudantes(-1)">-</button><span class="contador-valor numero-verde" id="lbl_ayudantes">0</span><button class="btn-3d btn-mini" onclick="cambiarAyudantes(1)">+</button></div>
-                </div>
-
-                <div class="seccion" style="padding-bottom: 5px;">
-                    <div class="titulo-seccion">2. Clasificación de Carga</div>
-                    <div class="grupo-botones-inline" id="box-transporte"><button class="btn-opcion-inline" onclick="clickBotonInline('box-transporte', this)">Camión</button><button class="btn-opcion-inline" onclick="clickBotonInline('box-transporte', this)">Contenedor</button><button class="btn-opcion-inline" onclick="clickBotonInline('box-transporte', this)">Camioneta</button><button class="btn-opcion-inline" onclick="clickBotonInline('box-transporte', this)">Furgón</button></div>
-                    <div class="grupo-botones-inline" id="box-carga"><button class="btn-opcion-inline" onclick="clickBotonInline('box-carga', this)">Pallets</button><button class="btn-opcion-inline" onclick="clickBotonInline('box-carga', this)">A Granel</button><button class="btn-opcion-inline" onclick="clickBotonInline('box-carga', this)">Mixto</button><button class="btn-opcion-inline" onclick="clickBotonInline('box-carga', this)">Bultos</button></div>
-                    <span class="etiqueta">Cant. Pallets Declarados</span>
-                    <div class="slider-bloque-completo"><div class="slider-numero-grande numero-verde" id="display-pallets">1</div><button class="btn-3d btn-mini" onclick="ajustarSlider(-1)">-</button><input type="range" id="barra-pallets" class="slider-linea-extendida" min="1" max="70" value="1" step="1" oninput="moverSliderLogico(this.value)"><button class="btn-3d btn-mini" onclick="ajustarSlider(1)">+</button></div>
-                </div>
-
-                <div class="seccion" id="bloque-documental" style="margin-bottom:0; padding-bottom: 12px;">
-                    <div class="titulo-seccion">3. Documentación Real</div>
-                    
-                    <div id="caja-botones-doc" style="display:flex; flex-direction:column; gap:8px;">
-                        <div style="display:flex; gap:8px;">
-                            <label for="file-remito" class="btn-3d btn-verde-exito" style="flex:1; padding:15px 2px; background-color:#00509E; box-shadow:0 4px 0 #002244;">📸 FOTO REMITO</label>
-                            <input type="file" id="file-remito" accept="image/*" capture="environment" style="display:none;" onchange="procesarFotoRemitoIA()">
-                            
-                            <button class="btn-3d btn-gris-topo" style="flex:1; padding:15px 2px;" onclick="mostrarCajaManual()">✏️ INGRESO MANUAL</button>
-                        </div>
-                        <button class="btn-3d btn-naranja" style="width:100%; padding:15px 2px;" onclick="desbloquearRecepcionSinOC()">🚫 REMITO SIN ORDEN DE COMPRA</button>
-                    </div>
-                    
-                    <div id="box-oc-falla" style="display:none; gap:8px;">
-                        <input type="number" id="txt-oc-manual" style="flex:2; padding:12px; background:#1e1e1e; color:#4CAF50; font-weight:bold; font-size:16px; border:1px solid #555; border-radius:4px;" placeholder="OC (Ej: 1234)">
-                        <button class="btn-3d btn-gris-topo" style="flex:1; font-size:12px;" onclick="buscarOCManualDigitada()">VALIDAR</button>
-                        <button class="btn-3d btn-rojo" style="width:40px; font-size:14px;" onclick="ocultarCajaManual()">X</button>
-                    </div>
-                    
-                    <div id="txt-ocr-status" style="text-align:center; font-weight:bold; margin-top:8px; color:#aaa; font-size:12px; display:none;"></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="pantalla-pallet-building" class="pantalla-modulo">
-            <div class="header"><span>CONSOLIDACIÓN</span><button class="btn-escape" onclick="volverMenuPrincipal()">🔙 SALIR</button></div>
-            <div class="bloque-contenido" style="justify-content: flex-start;">
-                <div class="seccion"><div class="titulo-seccion">Artículos en la Base SQL (Toque para asignar cantidad)</div><div id="contenedor-pool-articulos"></div></div>
-                <div class="seccion" style="background:#0a0a0a; border:1px dashed #555;">
-                    <div class="titulo-seccion" id="titulo-pallet-actual" style="border-color:#555;">CONSTRUYENDO PALLET N° 1</div>
-                    <table id="tabla-pallet-activo"><thead><tr><th>Artículo</th><th>Cant.</th></tr></thead><tbody id="cuerpo-pallet-activo"></tbody></table>
-                    <div style="display:flex; gap:10px; margin-top:15px;"><button class="btn-3d btn-gris-topo" style="flex:1;" onclick="cerrarPalletYSiguiente()">📦 Sig. Pallet</button><button class="btn-3d btn-verde-exito" style="flex:1;" onclick="irAVisualizarControl()">👁️ Resumen</button></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="pantalla-resumen" class="pantalla-modulo">
-            <div class="header"><span>CIERRE RECEPCIÓN</span><button class="btn-escape" onclick="volverAPallets()">🔙 VOLVER</button></div>
-            <div class="bloque-contenido" style="justify-content: flex-start;">
-                <div class="seccion"><div class="titulo-seccion">Resumen Estructural</div><div id="contenedor-resumen-pallets"></div></div>
-                <div id="caja-botones-cierre" style="display:flex; gap:10px; margin-top:10px;"><button class="btn-3d btn-gris-topo" style="flex:1;" onclick="irAlEditorB()">✏️ Editar</button><button class="btn-3d btn-verde-exito" style="flex:1;" onclick="iniciarFaseUnoCierre()">📧 CONFIRMAR</button></div>
-                <div id="caja-impresion-cierre" style="display:none; margin-top:10px;"><button class="btn-3d btn-bloque" id="btn-ejecutar-impresion" style="background-color:#ffffff; color:#000000; font-size:18px; padding:22px;" onclick="iniciarFaseDosImpresion()">🖨️ IMPRIMIR CARTELES</button></div>
-            </div>
-        </div>
-
-        <div id="pantalla-editor-b" class="pantalla-modulo">
-            <div class="header"><span>SELECCIÓN EDICIÓN</span><button class="btn-escape" onclick="confirmarEdicionFinalB()">🔙 VOLVER</button></div>
-            <div class="bloque-contenido" style="justify-content: flex-start;">
-                <div class="seccion"><div class="titulo-seccion">¿Qué editar?</div><div id="contenedor-selector-items-edit"></div></div>
-                <div style="display:flex; gap:10px; margin-top:10px;"><button class="btn-3d btn-rojo" id="btn-borrar-todo" style="flex:1;" onclick="borrarTodoElControl()">❌ Borrar Todo</button><button class="btn-3d btn-verde-exito" id="btn-confirmar-edicion-b" style="display:none; flex:1;" onclick="confirmarEdicionFinalB()">✅ Confirmar</button></div>
-            </div>
-        </div>
-
-        <div id="pantalla-editor-c" class="pantalla-modulo">
-            <div class="header"><span>REPARTO DE UNIDADES</span><button class="btn-escape" onclick="guardarCambiosItemC()">🔙 VOLVER</button></div>
-            <div class="bloque-contenido" style="justify-content: flex-start;">
-                <div class="seccion"><div class="titulo-seccion" id="titulo-edit-item-c">Editando Artículo</div><div id="contenedor-pallets-reparto-c"></div></div>
-                <button class="btn-3d btn-bloque btn-verde-exito" onclick="guardarCambiosItemC()">💾 Confirmar Item</button>
-            </div>
-        </div>
-    </div> 
-
-    <div class="calc-pantalla-overlay" id="calc-overlay">
-        <div class="calc-cuerpo">
-            <button class="btn-escape btn-escape-calc" onclick="cerrarOverlay('calc-overlay')">🔙 VOLVER</button>
-            <div style="color:#aaa; font-size:12px; margin-top:5px; font-weight:bold;" id="calc-titulo-contexto">INGRESE CANTIDAD</div>
-            <div class="calc-display numero-verde" id="calc-val-display">0</div>
-            <div class="calc-grid">
-                <button class="btn-calc" onclick="pressCalcNum('1')">1</button><button class="btn-calc" onclick="pressCalcNum('2')">2</button><button class="btn-calc" onclick="pressCalcNum('3')">3</button>
-                <button class="btn-calc" onclick="pressCalcNum('4')">4</button><button class="btn-calc" onclick="pressCalcNum('5')">5</button><button class="btn-calc" onclick="pressCalcNum('6')">6</button>
-                <button class="btn-calc" onclick="pressCalcNum('7')">7</button><button class="btn-calc" onclick="pressCalcNum('8')">8</button><button class="btn-calc" onclick="pressCalcNum('9')">9</button>
-                <button class="btn-calc" onclick="pressCalcClear()">C</button><button class="btn-calc" onclick="pressCalcNum('0')">0</button><button class="btn-calc btn-verde-exito" onclick="pressCalcOk()">OK</button>
-            </div>
-            <button class="btn-3d btn-bloque btn-gris-topo" style="margin-top:12px; font-size:14px; padding:12px;" id="btn-calc-todo">Asignar Todo</button>
+    <div id="vista-recepcion" style="display:none;">
+        <div class="header">RECEPCIÓN DE REMITO<button class="btn-salir" onclick="volverAlMenu()">❌ SALIR</button></div>
+        <div class="panel">
+            <div class="panel-titulo">Captura de Documento</div>
+            <button class="btn-azul" onclick="document.getElementById('input-camara').click()">📸 FOTO REMITO</button>
+            <input type="file" id="input-camara" accept="image/*" capture="environment" style="display:none;" onchange="procesarFoto(this)">
+            <img id="preview" class="preview-foto">
+            <div id="estado-ocr" class="estado" style="display:none;">Esperando documento...</div>
         </div>
     </div>
 
-    <div id="zona-impresion-a4-real"></div>
+    <div id="vista-consolidacion" style="display:none;">
+        <div class="header">CONSOLIDACIÓN<button class="btn-salir" onclick="volverAlMenu()">❌ SALIR</button></div>
+        
+        <div class="panel">
+            <div class="panel-titulo">🧠 Opciones Detectadas por IA</div>
+            <div id="contenedor-opciones-ia"></div>
+            
+            <div class="control-navegacion">
+                <button class="btn-nav" id="btn-prev" onclick="navegarArticulo(-1)">◀ ANTERIOR</button>
+                <div id="indicador-posicion" style="font-size: 14px; font-weight: bold; color: #ffc107;">Opción 0 de 0</div>
+                <button class="btn-nav" id="btn-next" onclick="navegarArticulo(1)">SIGUIENTE ▶</button>
+            </div>
+        </div>
+
+        <div class="panel" style="border-color: #ffc107;">
+            <div class="panel-titulo" style="color: #ffc107;">⌨️ Carga Manual / Buscador Alternativo</div>
+            <input type="text" class="input-manual" id="buscar-sku" placeholder="Buscar por Código SKU..." oninput="filtrarMaestroManual()">
+            <input type="text" class="input-manual" id="buscar-desc" placeholder="Buscar por Descripción..." oninput="filtrarMaestroManual()">
+            
+            <div id="resultado-busqueda-manual" style="max-height: 120px; overflow-y: auto; margin-bottom: 10px;"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-titulo">🔢 Cantidad Recibida</div>
+            <input type="number" class="input-manual" id="cantidad-recibida" placeholder="Ingrese cantidad..." style="font-size: 20px; text-align: center; font-weight: bold; color: #28a745;">
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-azul" style="background-color: #218838; margin:0; flex:1; padding: 18px;" onclick="agregarItemAlListado()">➕ AGREGAR ARTÍCULO</button>
+                <button class="btn-azul" style="background-color: #ffc107; color: black; margin:0; flex:1; padding: 18px;" onclick="cambiarPantalla('vista-palletizado')">👀 VER RESUMEN</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="vista-palletizado" style="display:none;">
+        <div class="header">SEPARACIÓN POR PALLETS<button class="btn-salir" onclick="volverAlMenu()">❌ SALIR</button></div>
+        
+        <div class="panel">
+            <div class="panel-titulo">📦 Construyendo Pallet Activo</div>
+            <h2 style="margin:0; text-align:center; color:#ffc107;">PALLET N° <span id="num-pallet-actual">1</span></h2>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn-azul" style="background-color: #6c757d; margin:0; flex:1;" onclick="cerrarPalletYFirma()">📦 SIG. PALLET</button>
+                <button class="btn-azul" style="background-color: #28a745; margin:0; flex:1;" onclick="finalizarCargaEntera()">💾 FINALIZAR CARGA</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-titulo">📋 Detalle de Mercadería Consolidada</div>
+            <table class="tabla-resumen">
+                <thead>
+                    <tr>
+                        <th>ARTÍCULO</th>
+                        <th>CANT.</th>
+                        <th>UBICACIÓN</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-items-recibidos"></tbody>
+            </table>
+        </div>
+    </div>
 
     <script>
-        let maestroArticulos = {}; 
+        const RUTA_MOTOR = "https://equate-dig-finless.ngrok-free.dev"; // Tu puente Ngrok
 
-        async function conectarBaseDeDatos() {
-            try {
-                // SE AGREGA EL HEADER PARA SALTAR LA PANTALLA AZUL DE NGROK
-                const respuesta = await fetch('https://equate-dig-finless.ngrok-free.dev/api/articulos', {
-                    headers: {
-                        'ngrok-skip-browser-warning': 'true'
-                    }
-                });
-                
-                if (!respuesta.ok) throw new Error("Rechazado");
-                maestroArticulos = await respuesta.json();
-                console.log("✅ Conectado al motor WMS con éxito");
-            } catch (error) {
-                console.error("❌ Error de conexión:", error);
-                alert("⚠️ Atención: No se pudo conectar con el motor WMS.");
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', conectarBaseDeDatos);
+        let maestroArticulos = {};      
+        let opcionesIA = [];           
+        let indiceActualIA = 0;        
+        let articuloSeleccionadoActual = null; 
         
-        let poolTrabajo = {}; 
-        let palletsConstruidos = []; let palletActivo = { id: 1, items: {} };
-        let tGlobal = 0; let intervalGlobal;
-        let remitoGlobal = "REMITO-REAL"; let proveedorGlobal = "GENERICO";
-        let numeroOCValidada = "1234"; let esPrimerEdicionB = true;
-        let currentCalcSku = ""; let currentCalcMode = "building"; let currentCalcPalletId = null;
+        let remitoGlobal = "";
+        let mercaderiaConsolidada = []; 
+        let contadorPallets = 1;
 
-        function volverMenuPrincipal() { if(confirm("¿Salir?")) { location.reload(); } }
-        function formatearTiempo(seg) { let m = Math.floor(seg/60); let s = seg%60; return (m<10?"0":"")+m+":"+(s<10?"0":"")+s; }
-        
-        function iniciarArriboCamion() {
-            cambiarPantalla('pantalla-ingreso');
-            clearInterval(intervalGlobal); 
-            intervalGlobal = setInterval(() => { tGlobal++; document.getElementById('time-global').innerText = formatearTiempo(tGlobal); }, 1000);
+        // Bajamos el catálogo de la base SQL al arrancar
+        window.onload = function() {
+            fetch(`${RUTA_MOTOR}/api/articulos`)
+                .then(res => res.json())
+                .then(data => { maestroArticulos = data; console.log("✅ Catálogo sincronizado."); })
+                .catch(err => alert("⚠️ Alerta: Sin conexión con el motor. Revisá Ngrok/Node."));
+        };
+
+        function cambiarPantalla(idPantalla) {
+            document.getElementById('vista-menu').style.display = 'none';
+            document.getElementById('vista-recepcion').style.display = 'none';
+            document.getElementById('vista-consolidacion').style.display = 'none';
+            document.getElementById('vista-palletizado').style.display = 'none';
+            document.getElementById(idPantalla).style.display = 'block';
         }
 
-        function cambiarPantalla(id) { 
-            let mods = document.getElementsByClassName('pantalla-modulo'); 
-            for(let m of mods) { m.classList.remove('activa'); m.style.display = 'none'; }
-            let dest = document.getElementById(id); dest.classList.add('activa'); dest.style.display = 'flex';
-        }
-        
-        function cambiarAyudantes(v) { let val = parseInt(document.getElementById('lbl_ayudantes').innerText) + v; document.getElementById('lbl_ayudantes').innerText = val < 0 ? 0 : val; }
-        function clickBotonInline(id, btn) { let btns = document.getElementById(id).getElementsByClassName('btn-opcion-inline'); for(let b of btns) b.classList.remove('activo'); btn.classList.add('activo'); }
-        function moverSliderLogico(v) { document.getElementById('display-pallets').innerText = v; }
-        function ajustarSlider(c) { let barra = document.getElementById('barra-pallets'); let n = parseInt(barra.value) + c; if(n>=1 && n<=70){ barra.value=n; moverSliderLogico(n); } }
-        function cerrarOverlay(id) { document.getElementById(id).style.display = "none"; }
+        function volverAlMenu() { cambiarPantalla('vista-menu'); }
 
-        async function procesarFotoRemitoIA() {
-            let archivoInput = document.getElementById('file-remito');
-            let foto = archivoInput.files[0];
-            if (!foto) return;
-
-            let status = document.getElementById('txt-ocr-status');
-            status.style.display = "block"; status.style.color = "#ffffff";
-            status.innerHTML = "Subiendo imagen al Motor IA... ⏳";
-
-            let formData = new FormData();
-            formData.append('foto_remito', foto);
-
-            try {
-                const respuesta = await fetch('https://equate-dig-finless.ngrok-free.dev/api/ocr', {
-                    method: 'POST',
-                    headers: { 'ngrok-skip-browser-warning': 'true' },
-                    body: formData
-                });
-
-                if (!respuesta.ok) throw new Error("El motor rechazó la imagen");
-                
-                const datosIA = await respuesta.json();
-                
-                remitoGlobal = datosIA.numero_remito || "S/N";
-                poolTrabajo = datosIA.articulos_detectados; 
-                
-                status.innerHTML = `✅ OCR Exitoso. Remito: ${remitoGlobal}`;
-                status.style.color = "#4CAF50";
-                
-                setTimeout(() => { iniciarDescargaFisica(); }, 1500);
-
-            } catch (error) {
-                console.error(error);
-                status.innerHTML = "❌ Error al leer la imagen. Ingrese manual.";
-                status.style.color = "#ff5252";
-            }
-        }
-
-        function desbloquearRecepcionSinOC() {
-            remitoGlobal = "SIN-OC-" + Math.floor(Math.random()*10000);
-            proveedorGlobal = "INGRESO EXCEPCIONAL";
-            poolTrabajo = {};
-            for(let sku in maestroArticulos) { poolTrabajo[sku] = 500; }
-            iniciarDescargaFisica();
-        }
-
-        function mostrarCajaManual() { document.getElementById('caja-botones-doc').style.display = "none"; document.getElementById('box-oc-falla').style.display = "flex"; }
-        function ocultarCajaManual() { document.getElementById('caja-botones-doc').style.display = "flex"; document.getElementById('box-oc-falla').style.display = "none"; }
-
-        function buscarOCManualDigitada() {
-            let digitos = document.getElementById('txt-oc-manual').value;
-            if(digitos !== "") { 
-                numeroOCValidada = digitos; 
-                poolTrabajo = {};
-                for(let sku in maestroArticulos) { poolTrabajo[sku] = 200; }
-                iniciarDescargaFisica(); 
-            }
-        }
-
-        function iniciarDescargaFisica() { cambiarPantalla('pantalla-pallet-building'); renderizarPool(); }
-        function volverAPallets() { cambiarPantalla('pantalla-pallet-building'); }
-
-        function renderizarPool() {
-            let c = document.getElementById('contenedor-pool-articulos'); c.innerHTML = ""; let vacio = true;
-            for(let sku in poolTrabajo) {
-                if(poolTrabajo[sku] > 0) { 
-                    vacio = false; 
-                    let descripcionReal = maestroArticulos[sku] ? maestroArticulos[sku].desc : "Artículo";
-                    c.innerHTML += `<div class="item-pool-fila" onclick="abrirCalculadora('${sku}', 'building')"><div><strong>${sku}</strong><br><small style="color:#aaa;">${descripcionReal}</small></div><div class="numero-verde">Disponibles: ${poolTrabajo[sku]}</div></div>`; 
-                }
-            }
-            if(vacio) c.innerHTML = `<div style="text-align:center; padding:15px; color:#4CAF50; font-weight:bold;">✅ Avance completado.</div>`;
-        }
-
-        function abrirCalculadora(sku, modo, pId = null) {
-            currentCalcSku = sku; currentCalcMode = modo; currentCalcPalletId = pId;
-            document.getElementById('calc-val-display').innerText = "0"; document.getElementById('calc-titulo-contexto').innerText = `ASIGNANDO: ${sku}`;
-            let btnTodo = document.getElementById('btn-calc-todo');
-            if(modo === 'building') { btnTodo.onclick = () => inyectarCant(poolTrabajo[sku]); } 
-            else { btnTodo.onclick = () => { let ya = palletsConstruidos.find(p=>p.id===pId).items[sku]||0; inyectarCant(ya + poolTrabajo[sku]); }; }
-            document.getElementById('calc-overlay').style.display = "flex";
-        }
-
-        function pressCalcNum(n) { let d = document.getElementById('calc-val-display'); d.innerText = d.innerText==="0" ? n : d.innerText+n; }
-        function pressCalcClear() { document.getElementById('calc-val-display').innerText = "0"; }
-        function pressCalcOk() { inyectarCant(parseInt(document.getElementById('calc-val-display').innerText)); }
-
-        function inyectarCant(cant) {
-            if(isNaN(cant) || cant < 0) return;
-            if(currentCalcMode === 'building') {
-                if(cant > poolTrabajo[currentCalcSku]) { alert("Excede bultos"); return; }
-                poolTrabajo[currentCalcSku] -= cant; palletActivo.items[currentCalcSku] = (palletActivo.items[currentCalcSku]||0) + cant;
-                renderizarPallet(); renderizarPool();
-            } else {
-                let pIdx = palletsConstruidos.findIndex(p=>p.id===currentCalcPalletId); let viejo = palletsConstruidos[pIdx].items[currentCalcSku]||0;
-                poolTrabajo[currentCalcSku] += viejo;
-                if(cant > poolTrabajo[currentCalcSku]) { alert("Excede total"); poolTrabajo[currentCalcSku] -= viejo; return; }
-                poolTrabajo[currentCalcSku] -= cant;
-                if(cant === 0) delete palletsConstruidos[pIdx].items[currentCalcSku]; else palletsConstruidos[pIdx].items[currentCalcSku] = cant;
-                renderizarRepartoPantallaC(currentCalcSku);
-            }
-            cerrarOverlay('calc-overlay');
-        }
-
-        function renderizarPallet() {
-            let c = document.getElementById('cuerpo-pallet-activo'); c.innerHTML = ""; let tiene = false;
-            for(let sku in palletActivo.items) {
-                if(palletActivo.items[sku] > 0) { 
-                    tiene = true; 
-                    let descripcionReal = maestroArticulos[sku] ? maestroArticulos[sku].desc : "";
-                    c.innerHTML += `<tr><td><strong>${sku}</strong><br><small style="color:#aaa;">${descripcionReal}</small></td><td class="numero-verde">${palletActivo.items[sku]} u.</td></tr>`; 
-                }
-            }
-            if(!tiene) c.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#666;">Seleccione artículos bulto por bulto</td></tr>`;
-        }
-
-        function cerrarPalletYSiguiente() {
-            if(Object.keys(palletActivo.items).length === 0) { alert("Vacío."); return; }
-            palletsConstruidos.push(JSON.parse(JSON.stringify(palletActivo)));
-            palletActivo = { id: palletActivo.id + 1, items: {} };
-            document.getElementById('titulo-pallet-actual').innerText = `CONSTRUYENDO PALLET N° ${palletActivo.id}`;
-            renderizarPallet();
-        }
-
-        function irAVisualizarControl() {
-            if(Object.keys(palletActivo.items).length > 0) { palletsConstruidos.push(JSON.parse(JSON.stringify(palletActivo))); palletActivo = { id: palletsConstruidos.length + 1, items: {} }; }
-            if(palletsConstruidos.length === 0) { alert("Consolide unidades."); return; }
-            cambiarPantalla('pantalla-resumen'); renderizarResumen();
-        }
-
-        function renderizarResumen() {
-            let c = document.getElementById('contenedor-resumen-pallets'); c.innerHTML = "";
-            palletsConstruidos.forEach(p => {
-                let html = ""; let skus = Object.keys(p.items); if(skus.length === 0) return;
-                skus.forEach(s => html += `<li><strong>${s}</strong> - <span class="numero-verde">${p.items[s]} u.</span></li>`);
-                c.innerHTML += `<div style="background:#0a0a0a; border:1px solid #444; padding:10px; border-radius:6px; margin-bottom:10px;"><div style="color:white; font-weight:bold; border-bottom:1px solid #333; padding-bottom:4px;">📦 PALLET N° ${p.id}</div><ul style="margin:6px 0 0 0; padding-left:20px; font-size:13px; color:#aaa;">${html}</ul></div>`;
-            });
-        }
-
-        function irAlEditorB() { cambiarPantalla('pantalla-editor-b'); renderizarSelectorItemsB(); }
-        function renderizarSelectorItemsB() {
-            let contenedor = document.getElementById('contenedor-selector-items-edit'); contenedor.innerHTML = "";
-            for(let sku in maestroArticulos) { 
-                if(poolTrabajo[sku] !== undefined || palletsConstruidos.some(p => p.items[sku])) {
-                    contenedor.innerHTML += `<button class="btn-3d btn-bloque btn-gris-topo" style="text-align:left; font-size:13px; margin-bottom:8px;" onclick="irAlEditorC('${sku}')">👉 <strong>${sku}</strong> - <span style="color:#ccc;">${maestroArticulos[sku].desc}</span></button>`; 
-                }
-            }
-            if(esPrimerEdicionB) { document.getElementById('btn-borrar-todo').style.display = "block"; document.getElementById('btn-confirmar-edicion-b').style.display = "none"; } else { document.getElementById('btn-borrar-todo').style.display = "none"; document.getElementById('btn-confirmar-edicion-b').style.display = "block"; }
-        }
-
-        function borrarTodoElControl() { if(confirm("¿Reiniciar?")) location.reload(); }
-        function irAlEditorC(sku) { esPrimerEdicionB = false; cambiarPantalla('pantalla-editor-c'); renderizarRepartoPantallaC(sku); }
-
-        function renderizarRepartoPantallaC(sku) {
-            document.getElementById('titulo-edit-item-c').innerText = `EDITANDO UNIDADES DE: ${sku}`; let contenedor = document.getElementById('contenedor-pallets-reparto-c'); contenedor.innerHTML = "";
-            palletsConstruidos.forEach(p => { let cantAsignada = p.items[sku] || 0; contenedor.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; background:#0a0a0a; padding:10px; border-radius:6px; margin-bottom:8px; border:1px solid #333;"><div><strong>📦 PALLET N° ${p.id}</strong></div><div class="btn-3d" style="background:#222; color:#4CAF50; padding:10px 18px; font-size:18px;" onclick="abrirCalculadora('${sku}', 'editing', ${p.id})">${cantAsignada} u.</div></div>`; });
-        }
-
-        function guardarCambiosItemC() { irAlEditorB(); }
-        function confirmarEdicionFinalB() { cambiarPantalla('pantalla-resumen'); renderizarResumen(); }
-
-        function iniciarFaseUnoCierre() {
-            clearInterval(intervalGlobal);
-            let totalesConsolidados = {};
-            palletsConstruidos.forEach(p => { for(let sku in p.items) { totalesConsolidados[sku] = (totalesConsolidados[sku] || 0) + p.items[sku]; } });
-            let detalleMailCuerpo = "";
-            for(let sku in totalesConsolidados) { detalleMailCuerpo += `• SKU: ${sku} -> Total Recibido: ${totalesConsolidados[sku]} u.%0D%0A`; }
-            let mailLink = `mailto:marcosdiaz@rqemprendimientos.com.ar?subject=Parte Recepcion Real - Remito: ${remitoGlobal}&body=Completado:%0D%0A%0D%0A${detalleMailCuerpo}`;
-            window.location.href = mailLink;
-            document.getElementById('caja-botones-cierre').style.display = 'none';
-            document.getElementById('caja-impresion-cierre').style.display = 'block';
-        }
-
-        function iniciarFaseDosImpresion() {
-            let btn = document.getElementById('btn-ejecutar-impresion');
-            btn.innerHTML = "⏳ ARMANDO HOJAS..."; btn.style.pointerEvents = "none";
-            let zonaPrint = document.getElementById('zona-impresion-a4-real');
-            zonaPrint.innerHTML = "";
+        function procesarFoto(input) {
+            if (!input.files || !input.files[0]) return;
             
-            palletsConstruidos.forEach(p => {
-                let skusEnEstePallet = Object.keys(p.items).filter(k => p.items[k] > 0);
-                if(skusEnEstePallet.length === 0) return;
-                let totalSkus = skusEnEstePallet.length; let slotsOcupados = 0;
-                let htmlHoja = `<div class="hoja-a4-fluida"><div class="titulo-print">ZONA DE RECEPCIÓN - WMS (PALLET N° ${p.id})</div>`;
-                
-                for(let i = 0; i < totalSkus; i++) {
-                    let sku = skusEnEstePallet[i]; let cant = p.items[sku];
-                    let descReal = maestroArticulos[sku] ? maestroArticulos[sku].desc : "Artículo de Depósito";
-                    if(slotsOcupados === 3) { htmlHoja += `<div class="limpiar-float"></div></div><div class="hoja-a4-fluida"><div class="titulo-print">ZONA DE RECEPCIÓN - WMS (PALLET N° ${p.id} - REFUERZO)</div>`; slotsOcupados = 0; }
-                    let urlQRSlot = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Recepcion-${sku}-${cant}`;
-                    htmlHoja += `<div class="print-slot"><div class="print-slot-top"><span class="print-texto-sku">${sku}</span><span class="print-texto-cant">${cant} u.</span><div class="limpiar-float"></div></div><div class="print-slot-bottom"><span class="print-texto-chico">DESC: ${descReal}<br>REMITO: ${remitoGlobal}</span><div class="print-qr-chico"><img src="${urlQRSlot}" /></div><div class="limpiar-float"></div></div></div>`;
-                    slotsOcupados++;
+            const divEstado = document.getElementById('estado-ocr');
+            const imgPreview = document.getElementById('preview');
+            
+            imgPreview.src = URL.createObjectURL(input.files[0]);
+            imgPreview.style.display = 'block';
+            divEstado.style.display = 'block';
+            divEstado.style.backgroundColor = '#0056b3';
+            divEstado.innerText = "⏳ Procesando remito con Inteligencia Artificial...";
+
+            const formData = new FormData();
+            formData.append('foto_remito', input.files[0]);
+
+            fetch(`${RUTA_MOTOR}/api/ocr`, { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    divEstado.style.backgroundColor = '#1e7e34';
+                    
+                    // Verificamos si cruzó con una Orden de Compra válida
+                    if (data.orden_compra === "FALTANTE") {
+                        alert("🚨 ATENCIÓN: Este remito NO TIENE una Orden de Compra asociada. Se disparó una alerta a Administración.");
+                    } else {
+                        alert(`🎯 ¡ÉXITO! Se detectó la Orden de Compra: ${data.orden_compra}`);
+                    }
+                    
+                    remitoGlobal = data.numero_remito;
+                    opcionesIA = Object.keys(data.articulos_detectados);
+                    indiceActualIA = 0;
+
+                    setTimeout(() => {
+                        cambiarPantalla('vista-consolidacion');
+                        renderizarOpcionesIA();
+                    }, 1000);
+                })
+                .catch(err => {
+                    divEstado.style.backgroundColor = '#b30000';
+                    divEstado.innerText = "❌ Error al procesar el documento.";
+                });
+        }
+
+        // CARGA LAS OPCIONES E IMPRIME LA ENUMERACIÓN REAL SOLICITADA
+        function renderizarOpcionesIA() {
+            const contenedor = document.getElementById('contenedor-opciones-ia');
+            const indicador = document.getElementById('indicador-posicion');
+            contenedor.innerHTML = "";
+
+            if (opcionesIA.length === 0) {
+                contenedor.innerHTML = `<div style="text-align:center; color:#aaa; padding:10px; font-size:14px;">❌ La IA no detectó artículos en el maestro.<br>Cargue el producto manualmente abajo.</div>`;
+                indicador.innerText = "Opción 0 de 0";
+                articuloSeleccionadoActual = null;
+                return;
+            }
+
+            const skuDetectado = opcionesIA[indiceActualIA];
+            const infoArt = maestroArticulos[skuDetectado] || { desc: "Artículo Desconocido" };
+            articuloSeleccionadoActual = skuDetectado;
+
+            contenedor.innerHTML = `
+                <div class="card-articulo seleccionado">
+                    <div>
+                        <div class="sku">${skuDetectado}</div>
+                        <div class="desc">${infoArt.desc}</div>
+                    </div>
+                    <div class="cant-stock">🤖 IA</div>
+                </div>
+            `;
+            // AQUÍ SE MUESTRA TU REQUERIMIENTO DE ENUMERACIÓN ESTRICTA
+            indicador.innerText = `Opción ${indiceActualIA + 1} de ${opcionesIA.length}`;
+        }
+
+        function navegarArticulo(direccion) {
+            if (opcionesIA.length === 0) return;
+            indiceActualIA += direccion;
+            if (indiceActualIA < 0) indiceActualIA = opcionesIA.length - 1;
+            if (indiceActualIA >= opcionesIA.length) indiceActualIA = 0;
+            renderizarOpcionesIA();
+        }
+
+        // LÓGICA FILTRADORA PARA LA CARGA MANUAL CENTRAL
+        function filtrarMaestroManual() {
+            const txtSku = document.getElementById('buscar-sku').value.toLowerCase();
+            const txtDesc = document.getElementById('buscar-desc').value.toLowerCase();
+            const contenedorResultados = document.getElementById('resultado-busqueda-manual');
+            
+            contenedorResultados.innerHTML = "";
+            if (txtSku === "" && txtDesc === "") return;
+
+            Object.keys(maestroArticulos).forEach(sku => {
+                const descripcion = maestroArticulos[sku].desc.toLowerCase();
+                const skuMin = sku.toLowerCase();
+
+                if ((txtSku !== "" && skuMin.includes(txtSku)) || (txtDesc !== "" && descripcion.includes(txtDesc))) {
+                    const divRes = document.createElement('div');
+                    divRes.style = "background:#333; padding:10px; margin-bottom:5px; border-radius:3px; cursor:pointer; font-size:13px; border-left: 3px solid #ffc107;";
+                    divRes.innerHTML = `<strong>${sku}</strong> - ${maestroArticulos[sku].desc}`;
+                    divRes.onclick = function() {
+                        articuloSeleccionadoActual = sku;
+                        document.getElementById('contenedor-opciones-ia').innerHTML = `
+                            <div class="card-articulo" style="border-left-color: #ffc107; background-color: #3a321d;">
+                                <div>
+                                    <div class="sku" style="color:#ffc107;">${sku}</div>
+                                    <div class="desc">${maestroArticulos[sku].desc}</div>
+                                </div>
+                                <div class="cant-stock" style="color:#ffc107;">✍️ MANUAL</div>
+                            </div>
+                        `;
+                        contenedorResultados.innerHTML = "";
+                        document.getElementById('buscar-sku').value = "";
+                        document.getElementById('buscar-desc').value = "";
+                    };
+                    contenedorResultados.appendChild(divRes);
                 }
-                while(slotsOcupados < 3) { htmlHoja += `<div class="print-slot" style="border: 2px dashed #999 !important; height:42mm !important; text-align:center !important; font-size:16pt !important; padding-top:15mm !important; color:#666 !important;">[ ESPACIO LIBRE PARA ACOMODAR ]</div>`; slotsOcupados++; }
-                let urlQRMaestro = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PALLET-${p.id}`;
-                htmlHoja += `<div class="print-maestro-box"><span class="print-maestro-texto">MANIFIESTO<br>PALLET N° ${p.id}</span><div class="print-qr-maestro"><img src="${urlQRMaestro}" /></div><div class="limpiar-float"></div></div><div class="limpiar-float"></div></div>`;
-                zonaPrint.innerHTML += htmlHoja;
+            });
+        }
+
+        function agregarItemAlListado() {
+            const inputCant = document.getElementById('cantidad-recibida');
+            const cantidad = parseInt(inputCant.value);
+
+            if (!articuloSeleccionadoActual) {
+                alert("❌ Seleccione un artículo antes de continuar.");
+                return;
+            }
+            if (isNaN(cantidad) || cantidad <= 0) {
+                alert("❌ Ingrese una cantidad válida.");
+                return;
+            }
+
+            mercaderiaConsolidada.push({
+                sku: articuloSeleccionadoActual,
+                descripcion: maestroArticulos[articuloSeleccionadoActual].desc,
+                cant: cantidad,
+                pallet: contadorPallets
             });
 
-            setTimeout(() => {
-                window.print();
-                window.onafterprint = function() { location.reload(); };
-                btn.innerHTML = "🖨️ IMPRIMIR CARTELES"; btn.style.pointerEvents = "auto";
-            }, 1000);
+            alert(`✅ Registrado: ${articuloSeleccionadoActual} x ${cantidad} (Asignado al Pallet ${contadorPallets})`);
+            inputCant.value = "";
+            actualizarTablaResumen();
+        }
+
+        function actualizarTablaResumen() {
+            const tbody = document.getElementById('tabla-items-recibidos');
+            tbody.innerHTML = "";
+            mercaderiaConsolidada.forEach(item => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td><strong>${item.sku}</strong><br><span style="font-size:11px; color:#aaa;">${item.descripcion}</span></td>
+                    <td><span style="color:#28a745; font-weight:bold;">${item.cant}</span></td>
+                    <td><span class="badge-pallet">PALLET ${item.pallet}</span></td>
+                `;
+                tbody.appendChild(fila);
+            });
+        }
+
+        function cerrarPalletYFirma() {
+            if (mercaderiaConsolidada.filter(i => i.pallet === contadorPallets).length === 0) {
+                alert("⚠️ No podés dejar un pallet vacío.");
+                return;
+            }
+            alert(`📦 Pallet N° ${contadorPallets} cerrado. Iniciando Pallet N° ${contadorPallets + 1}.`);
+            contadorPallets++;
+            document.getElementById('num-pallet-actual').innerText = contadorPallets;
+        }
+
+        function finalizarCargaEntera() {
+            if (mercaderiaConsolidada.length === 0) {
+                alert("❌ No hay mercadería registrada.");
+                return;
+            }
+            alert(`🎉 ¡RECEPCIÓN CONCLUIDA!\nTotal: ${mercaderiaConsolidada.length} ítems en ${contadorPallets} pallets.\nDatos consolidados.`);
+            mercaderiaConsolidada = [];
+            contadorPallets = 1;
+            document.getElementById('num-pallet-actual').innerText = contadorPallets;
+            actualizarTablaResumen();
+            volverAlMenu();
         }
     </script>
 </body>
