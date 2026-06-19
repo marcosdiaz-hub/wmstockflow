@@ -329,15 +329,17 @@
     <div id="zona-impresion-a4-real"></div>
 
     <script>
-        let maestroArticulos = {}; 
+ let maestroArticulos = {}; 
 
         async function conectarBaseDeDatos() {
             try {
+                // RUTA INTERNACIONAL SEGURA VÍA NGROK
                 const respuesta = await fetch('https://equate-dig-finless.ngrok-free.dev/api/articulos');
                 if (!respuesta.ok) throw new Error("Rechazado");
                 maestroArticulos = await respuesta.json();
+                console.log("✅ Conectado al motor WMS con éxito");
             } catch (error) {
-                alert("⚠️ Error: El celular no encuentra el motor en 192.168.1.46:3000.");
+                console.error("❌ Error de conexión:", error);
             }
         }
 
@@ -443,4 +445,111 @@
                 let pIdx = palletsConstruidos.findIndex(p=>p.id===currentCalcPalletId); let viejo = palletsConstruidos[pIdx].items[currentCalcSku]||0;
                 poolTrabajo[currentCalcSku] += viejo;
                 if(cant > poolTrabajo[currentCalcSku]) { alert("Excede total"); poolTrabajo[currentCalcSku] -= viejo; return; }
-                poolTrabajo
+                poolTrabajo[currentCalcSku] -= cant;
+                if(cant === 0) delete palletsConstruidos[pIdx].items[currentCalcSku]; else palletsConstruidos[pIdx].items[currentCalcSku] = cant;
+                renderizarRepartoPantallaC(currentCalcSku);
+            }
+            cerrarOverlay('calc-overlay');
+        }
+
+        function renderizarPallet() {
+            let c = document.getElementById('cuerpo-pallet-activo'); c.innerHTML = ""; let tiene = false;
+            for(let sku in palletActivo.items) {
+                if(palletActivo.items[sku] > 0) { 
+                    tiene = true; 
+                    let descripcionReal = maestroArticulos[sku] ? maestroArticulos[sku].desc : "";
+                    c.innerHTML += `<tr><td><strong>${sku}</strong><br><small style="color:#aaa;">${descripcionReal}</small></td><td class="numero-verde">${palletActivo.items[sku]} u.</td></tr>`; 
+                }
+            }
+            if(!tiene) c.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#666;">Seleccione artículos bulto por bulto</td></tr>`;
+        }
+
+        function cerrarPalletYSiguiente() {
+            if(Object.keys(palletActivo.items).length === 0) { alert("Vacío."); return; }
+            palletsConstruidos.push(JSON.parse(JSON.stringify(palletActivo)));
+            palletActivo = { id: palletActivo.id + 1, items: {} };
+            document.getElementById('titulo-pallet-actual').innerText = `CONSTRUYENDO PALLET N° ${palletActivo.id}`;
+            renderizarPallet();
+        }
+
+        function irAVisualizarControl() {
+            if(Object.keys(palletActivo.items).length > 0) { palletsConstruidos.push(JSON.parse(JSON.stringify(palletActivo))); palletActivo = { id: palletsConstruidos.length + 1, items: {} }; }
+            if(palletsConstruidos.length === 0) { alert("Consolide unidades."); return; }
+            cambiarPantalla('pantalla-resumen'); renderizarResumen();
+        }
+
+        function renderizarResumen() {
+            let c = document.getElementById('contenedor-resumen-pallets'); c.innerHTML = "";
+            palletsConstruidos.forEach(p => {
+                let html = ""; let skus = Object.keys(p.items); if(skus.length === 0) return;
+                skus.forEach(s => html += `<li><strong>${s}</strong> - <span class="numero-verde">${p.items[s]} u.</span></li>`);
+                c.innerHTML += `<div style="background:#0a0a0a; border:1px solid #444; padding:10px; border-radius:6px; margin-bottom:10px;"><div style="color:white; font-weight:bold; border-bottom:1px solid #333; padding-bottom:4px;">📦 PALLET N° ${p.id}</div><ul style="margin:6px 0 0 0; padding-left:20px; font-size:13px; color:#aaa;">${html}</ul></div>`;
+            });
+        }
+
+        function irAlEditorB() { cambiarPantalla('pantalla-editor-b'); renderizarSelectorItemsB(); }
+        function renderizarSelectorItemsB() {
+            let contenedor = document.getElementById('contenedor-selector-items-edit'); contenedor.innerHTML = "";
+            for(let sku in maestroArticulos) { 
+                if(poolTrabajo[sku] !== undefined || palletsConstruidos.some(p => p.items[sku])) {
+                    contenedor.innerHTML += `<button class="btn-3d btn-bloque btn-gris-topo" style="text-align:left; font-size:13px; margin-bottom:8px;" onclick="irAlEditorC('${sku}')">👉 <strong>${sku}</strong> - <span style="color:#ccc;">${maestroArticulos[sku].desc}</span></button>`; 
+                }
+            }
+            if(esPrimerEdicionB) { document.getElementById('btn-borrar-todo').style.display = "block"; document.getElementById('btn-confirmar-edicion-b').style.display = "none"; } else { document.getElementById('btn-borrar-todo').style.display = "none"; document.getElementById('btn-confirmar-edicion-b').style.display = "block"; }
+        }
+
+        function borrarTodoElControl() { if(confirm("¿Reiniciar?")) location.reload(); }
+        function irAlEditorC(sku) { esPrimerEdicionB = false; cambiarPantalla('pantalla-editor-c'); renderizarRepartoPantallaC(sku); }
+
+        function renderizarRepartoPantallaC(sku) {
+            document.getElementById('titulo-edit-item-c').innerText = `EDITANDO UNIDADES DE: ${sku}`; let contenedor = document.getElementById('contenedor-pallets-reparto-c'); contenedor.innerHTML = "";
+            palletsConstruidos.forEach(p => { let cantAsignada = p.items[sku] || 0; contenedor.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; background:#0a0a0a; padding:10px; border-radius:6px; margin-bottom:8px; border:1px solid #333;"><div><strong>📦 PALLET N° ${p.id}</strong></div><div class="btn-3d" style="background:#222; color:#4CAF50; padding:10px 18px; font-size:18px;" onclick="abrirCalculadora('${sku}', 'editing', ${p.id})">${cantAsignada} u.</div></div>`; });
+        }
+
+        function guardarCambiosItemC() { irAlEditorB(); }
+        function confirmarEdicionFinalB() { cambiarPantalla('pantalla-resumen'); renderizarResumen(); }
+
+        function iniciarFaseUnoCierre() {
+            clearInterval(intervalGlobal);
+            let totalesConsolidados = {};
+            palletsConstruidos.forEach(p => { for(let sku in p.items) { totalesConsolidados[sku] = (totalesConsolidados[sku] || 0) + p.items[sku]; } });
+            let detalleMailCuerpo = "";
+            for(let sku in totalesConsolidados) { detalleMailCuerpo += `• SKU: ${sku} -> Total Recibido: ${totalesConsolidados[sku]} u.%0D%0A`; }
+            let mailLink = `mailto:marcosdiaz@rqemprendimientos.com.ar?subject=Parte Recepcion Real - Remito: ${remitoGlobal}&body=Completado:%0D%0A%0D%0A${detalleMailCuerpo}`;
+            window.location.href = mailLink;
+            document.getElementById('caja-botones-cierre').style.display = 'none';
+            document.getElementById('caja-impresion-cierre').style.display = 'block';
+        }
+
+        function iniciarFaseDosImpresion() {
+            let btn = document.getElementById('btn-ejecutar-impresion');
+            btn.innerHTML = "⏳ ARMANDO HOJAS..."; btn.style.pointerEvents = "none";
+            let zonaPrint = document.getElementById('zona-impresion-a4-real');
+            zonaPrint.innerHTML = "";
+            
+            palletsConstruidos.forEach(p => {
+                let skusEnEstePallet = Object.keys(p.items).filter(k => p.items[k] > 0);
+                if(skusEnEstePallet.length === 0) return;
+                let totalSkus = skusEnEstePallet.length; let slotsOcupados = 0;
+                let htmlHoja = `<div class="hoja-a4-fluida"><div class="titulo-print">ZONA DE RECEPCIÓN - WMS (PALLET N° ${p.id})</div>`;
+                
+                for(let i = 0; i < totalSkus; i++) {
+                    let sku = skusEnEstePallet[i]; let cant = p.items[sku];
+                    let descReal = maestroArticulos[sku] ? maestroArticulos[sku].desc : "Artículo de Depósito";
+                    if(slotsOcupados === 3) { htmlHoja += `<div class="limpiar-float"></div></div><div class="hoja-a4-fluida"><div class="titulo-print">ZONA DE RECEPCIÓN - WMS (PALLET N° ${p.id} - REFUERZO)</div>`; slotsOcupados = 0; }
+                    let urlQRSlot = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Recepcion-${sku}-${cant}`;
+                    htmlHoja += `<div class="print-slot"><div class="print-slot-top"><span class="print-texto-sku">${sku}</span><span class="print-texto-cant">${cant} u.</span><div class="limpiar-float"></div></div><div class="print-slot-bottom"><span class="print-texto-chico">DESC: ${descReal}<br>REMITO: ${remitoGlobal}</span><div class="print-qr-chico"><img src="${urlQRSlot}" /></div><div class="limpiar-float"></div></div></div>`;
+                    slotsOcupados++;
+                }
+                while(slotsOcupados < 3) { htmlHoja += `<div class="print-slot" style="border: 2px dashed #999 !important; height:42mm !important; text-align:center !important; font-size:16pt !important; padding-top:15mm !important; color:#666 !important;">[ ESPACIO LIBRE PARA ACOMODAR ]</div>`; slotsOcupados++; }
+                let urlQRMaestro = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PALLET-${p.id}`;
+                htmlHoja += `<div class="print-maestro-box"><span class="print-maestro-texto">MANIFIESTO<br>PALLET N° ${p.id}</span><div class="print-qr-maestro"><img src="${urlQRMaestro}" /></div><div class="limpiar-float"></div></div><div class="limpiar-float"></div></div>`;
+                zonaPrint.innerHTML += htmlHoja;
+            });
+
+            setTimeout(() => {
+                window.print();
+                window.onafterprint = function() { location.reload(); };
+                btn.innerHTML = "🖨️ IMPRIMIR CARTELES"; btn.style.pointerEvents = "auto";
+            }, 1000);
+        }
