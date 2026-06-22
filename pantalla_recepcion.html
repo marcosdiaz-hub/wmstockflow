@@ -10,29 +10,17 @@
         .btn-salir { position: absolute; right: 10px; top: 10px; background-color: #b30000; color: white; border: none; padding: 5px 10px; font-weight: bold; border-radius: 3px; cursor: pointer; }
         .panel { background-color: #1e1e1e; border: 1px dashed #444; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
         .panel-titulo { font-size: 13px; font-weight: bold; text-transform: uppercase; color: #bbb; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        
-        /* BOTONES PRINCIPALES */
-        .btn-verde { background-color: #1e7e34; color: white; width: 100%; padding: 20px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .btn-verde { background-color: #1e7e34; color: white; width: 100%; padding: 20px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; display: block; box-sizing: border-box; }
         .btn-azul { background-color: #0056b3; color: white; width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        
         .preview-foto { width: 100%; max-height: 200px; object-fit: contain; margin-top: 10px; display: none; border-radius: 5px; border: 1px solid #444; }
         .estado { background-color: #2d2d2d; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-top: 10px; font-size: 14px; }
-        
-        /* TARJETAS DE ARTÍCULOS */
         .card-articulo { background-color: #252525; border-left: 5px solid #28a745; padding: 12px; margin-bottom: 10px; border-radius: 0 5px 5px 0; display: flex; justify-content: space-between; align-items: center; }
         .card-articulo.seleccionado { background-color: #2e4a33; border-left-color: #218838; }
         .sku { font-weight: bold; color: #28a745; font-size: 16px; }
         .desc { font-size: 13px; color: #ccc; margin-top: 3px; }
         .cant-stock { color: #28a745; font-weight: bold; text-align: right; font-size: 16px; }
-        
-        /* DISTRIBUCIÓN HORIZONTAL ESTRICTA (FLEXBOX) */
-        .control-navegacion { display: flex; justify-content: space-between; align-items: center; background-color: #252525; padding: 8px 12px; border-radius: 5px; margin-bottom: 15px; gap: 10px; }
-        .btn-nav { background-color: #444; color: white; border: none; padding: 12px 0; font-weight: bold; font-size: 14px; border-radius: 4px; cursor: pointer; flex: 1; text-align: center; width: 100%; }
-        
-        .contenedor-fila-botones { display: flex; gap: 10px; margin-top: 15px; width: 100%; }
-        .btn-accion-mitad { color: white; padding: 16px 0; font-size: 14px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; flex: 1; text-align: center; text-transform: uppercase; }
-        
-        /* TABLAS Y BUSCADOR */
+        .control-navegacion { display: flex; justify-content: space-between; align-items: center; background-color: #252525; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
+        .btn-nav { background-color: #444; color: white; border: none; padding: 10px 20px; font-weight: bold; font-size: 16px; border-radius: 3px; cursor: pointer; }
         .input-manual { width: 100%; padding: 10px; box-sizing: border-box; background-color: #2b2b2b; color: white; border: 1px solid #444; border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
         .tabla-resumen { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .tabla-resumen th { background-color: #333; text-align: left; padding: 8px; font-size: 12px; color: #aaa; }
@@ -50,9 +38,9 @@
     </div>
 
     <div id="vista-recepcion" style="display:none;">
-        <div class="header">RECEPCIÓN DE REMITO<button class="btn-salir" onclick="volverAlMenu()">❌ SALIR</button></div>
+        <div class="header">ZONA DE RECEPCIÓN<button class="btn-salir" onclick="volverAlMenu()">❌ SALIR</button></div>
         <div class="panel">
-            <div class="panel-titulo">Captura de Documento</div>
+            <div class="panel-titulo">Captura de Remito Original</div>
             <button class="btn-azul" onclick="document.getElementById('input-camara').click()">📸 FOTO REMITO</button>
             <input type="file" id="input-camara" accept="image/*" capture="environment" style="display:none;" onchange="procesarFoto(this)">
             <img id="preview" class="preview-foto">
@@ -68,16 +56,16 @@
             <div id="contenedor-opciones-ia"></div>
             
             <div class="control-navegacion">
-                <button class="btn-nav" id="btn-prev" onclick="navegarArticulo(-1)">◀ ANT.</button>
-                <div id="indicador-posicion" style="font-size: 14px; font-weight: bold; color: #ffc107; min-width: 100px; text-align: center;">Opción 0 de 0</div>
-                <button class="btn-nav" id="btn-next" onclick="navegarArticulo(1)">SIG. ▶</button>
+                <button class="btn-nav" id="btn-prev" onclick="navegarArticulo(-1)">◀ ANTERIOR</button>
+                <div id="indicador-posicion" style="font-size: 14px; font-weight: bold; color: #ffc107;">Opción 0 de 0</div>
+                <button class="btn-nav" id="btn-next" onclick="navegarArticulo(1)">SIGUIENTE ▶</button>
             </div>
         </div>
 
         <div class="panel" style="border-color: #ffc107;">
-            <div class="panel-titulo" style="color: #ffc107;">⌨️ Carga Manual / Buscador Alternativo</div>
+            <div class="panel-titulo" style="color: #ffc107;">⌨️ Carga Manual Alternativa</div>
             <input type="text" class="input-manual" id="buscar-sku" placeholder="Buscar por Código SKU..." oninput="filtrarMaestroManual()">
-            <input type="text" class="input-manual" id="buscar-desc" placeholder="Buscar por Descripción..." oninput="filtrarMaestroManual()">
+            <input type="text" class="input-manual" id="buscar-desc" placeholder="Buscar o Escribir Descripción..." oninput="filtrarMaestroManual()">
             
             <div id="resultado-busqueda-manual" style="max-height: 120px; overflow-y: auto; margin-bottom: 10px;"></div>
         </div>
@@ -86,9 +74,9 @@
             <div class="panel-titulo">🔢 Cantidad Recibida</div>
             <input type="number" class="input-manual" id="cantidad-recibida" placeholder="Ingrese cantidad..." style="font-size: 20px; text-align: center; font-weight: bold; color: #28a745;">
             
-            <div class="contenedor-fila-botones">
-                <button class="btn-accion-mitad" style="background-color: #218838;" onclick="agregarItemAlListado()">➕ AGREGAR</button>
-                <button class="btn-accion-mitad" style="background-color: #ffc107; color: black;" onclick="cambiarPantalla('vista-palletizado')">👀 RESUMEN</button>
+            <div style="margin-top: 15px;">
+                <button class="btn-verde" style="background-color: #218838; margin-bottom: 10px; padding: 18px; font-size: 16px; width: 100%;" onclick="agregarItemAlListado()">➕ AGREGAR AL PALLET</button>
+                <button class="btn-verde" style="background-color: #ffc107; color: black; padding: 15px; font-size: 15px; width: 100%;" onclick="cambiarPantalla('vista-palletizado')">👀 VER RESUMEN DE CARGA</button>
             </div>
         </div>
     </div>
@@ -99,20 +87,20 @@
         <div class="panel">
             <div class="panel-titulo">📦 Construyendo Pallet Activo</div>
             <h2 style="margin:0; text-align:center; color:#ffc107;">PALLET N° <span id="num-pallet-actual">1</span></h2>
-            <div class="contenedor-fila-botones">
-                <button class="btn-accion-mitad" style="background-color: #6c757d;" onclick="cerrarPalletYFirma()">📦 SIG. PALLET</button>
-                <button class="btn-accion-mitad" style="background-color: #28a745;" onclick="finalizarCargaEntera()">💾 FINALIZAR</button>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn-azul" style="background-color: #6c757d; margin:0; flex:1;" onclick="cerrarPalletYFirma()">📦 SIG. PALLET</button>
+                <button class="btn-azul" style="background-color: #28a745; margin:0; flex:1;" onclick="finalizarCargaEntera()">💾 FINALIZAR CARGA</button>
             </div>
         </div>
 
         <div class="panel">
-            <div class="panel-titulo">📋 Detalle de Mercadería Consolidada</div>
+            <div class="panel-titulo">📋 Detalle Consolidado</div>
             <table class="tabla-resumen">
                 <thead>
                     <tr>
                         <th>ARTÍCULO</th>
                         <th>CANT.</th>
-                        <th>UBICACIÓN</th>
+                        <th>PALLET</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-items-recibidos"></tbody>
@@ -121,7 +109,7 @@
     </div>
 
     <script>
-        const RUTA_MOTOR = "https://equate-dig-finless.ngrok-free.dev"; // Tu puente Ngrok intacto
+        const RUTA_MOTOR = "https://equate-dig-finless.ngrok-free.dev"; 
 
         let maestroArticulos = {};      
         let opcionesIA = [];           
@@ -131,22 +119,20 @@
         let mercaderiaConsolidada = []; 
         let contadorPallets = 1;
 
-        // Carga inicial del catálogo
         function cargarCatalogoEmpresa() {
             fetch(`${RUTA_MOTOR}/api/articulos`)
                 .then(res => res.json())
                 .then(data => { 
                     maestroArticulos = data; 
-                    console.log("✅ Catálogo sincronizado con el motor."); 
+                    console.log("✅ Catálogo sincronizado."); 
                 })
                 .catch(err => {
-                    console.log("⚠️ Sincronización en espera.");
+                    console.log("⚠️ Error sincronizando.");
                 });
         }
 
         window.onload = cargarCatalogoEmpresa;
 
-        // Navegación entre vistas
         function cambiarPantalla(idPantalla) {
             document.getElementById('vista-menu').style.display = 'none';
             document.getElementById('vista-recepcion').style.display = 'none';
@@ -157,7 +143,6 @@
 
         function volverAlMenu() { cambiarPantalla('vista-menu'); }
 
-        // Lógica de IA y lectura
         function procesarFoto(input) {
             if (!input.files || !input.files[0]) return;
             
@@ -179,9 +164,9 @@
                     divEstado.style.backgroundColor = '#1e7e34';
                     
                     if (data.orden_compra === "FALTANTE") {
-                        alert("🚨 ATENCIÓN: Este remito NO TIENE una Orden de Compra asociada en sistema. Se disparará una alerta por mail.");
+                        alert("🚨 ATENCIÓN: Este remito NO TIENE Orden de Compra asociada. Alerta enviada a Administración.");
                     } else {
-                        alert(`🎯 ¡ÉXITO! Se detectó la Orden de Compra asociada: ${data.orden_compra}`);
+                        alert(`🎯 ¡ÉXITO! Orden de Compra detectada: ${data.orden_compra}`);
                     }
                     
                     remitoGlobal = data.numero_remito;
@@ -196,18 +181,16 @@
                 .catch(err => {
                     divEstado.style.backgroundColor = '#b30000';
                     divEstado.innerText = "❌ Error de red con el motor.";
-                    alert("❌ Error de comunicación con la PC.");
                 });
         }
 
-        // Renderizar opciones enumeradas
         function renderizarOpcionesIA() {
             const contenedor = document.getElementById('contenedor-opciones-ia');
             const indicador = document.getElementById('indicador-posicion');
             contenedor.innerHTML = "";
 
             if (opcionesIA.length === 0) {
-                contenedor.innerHTML = `<div style="text-align:center; color:#aaa; padding:10px; font-size:14px;">❌ La IA no detectó artículos en el maestro.<br>Cargue el producto manualmente abajo.</div>`;
+                contenedor.innerHTML = `<div style="text-align:center; color:#aaa; padding:10px; font-size:14px;">❌ La IA no detectó coincidencias.<br>Utilice la Carga Manual Alternativa.</div>`;
                 indicador.innerText = "Opción 0 de 0";
                 articuloSeleccionadoActual = null;
                 return;
@@ -237,7 +220,7 @@
             renderizarOpcionesIA();
         }
 
-        // Buscador Manual Predictivo
+        // EL BUSCADOR MANUAL CON LA CAPACIDAD DE FORZAR EL INGRESO
         function filtrarMaestroManual() {
             const txtSku = document.getElementById('buscar-sku').value.toLowerCase();
             const txtDesc = document.getElementById('buscar-desc').value.toLowerCase();
@@ -246,11 +229,14 @@
             contenedorResultados.innerHTML = "";
             if (txtSku === "" && txtDesc === "") return;
 
+            let encontrados = 0;
+
             Object.keys(maestroArticulos).forEach(sku => {
                 const descripcion = maestroArticulos[sku].desc.toLowerCase();
                 const skuMin = sku.toLowerCase();
 
                 if ((txtSku !== "" && skuMin.includes(txtSku)) || (txtDesc !== "" && descripcion.includes(txtDesc))) {
+                    encontrados++;
                     const divRes = document.createElement('div');
                     divRes.style = "background:#333; padding:10px; margin-bottom:5px; border-radius:3px; cursor:pointer; font-size:13px; border-left: 3px solid #ffc107;";
                     divRes.innerHTML = `<strong>${sku}</strong> - ${maestroArticulos[sku].desc}`;
@@ -272,15 +258,43 @@
                     contenedorResultados.appendChild(divRes);
                 }
             });
+
+            // LA MAGIA DE RESCATE: Si no encuentra nada, te deja inventar el artículo igual.
+            if (encontrados === 0) {
+                const divRescate = document.createElement('div');
+                divRescate.style = "background:#5a1a1a; padding:10px; margin-bottom:5px; border-radius:3px; cursor:pointer; font-size:13px; border-left: 3px solid #ff4444;";
+                divRescate.innerHTML = `⚠️ <strong>No existe en la base de datos</strong><br>Tocar aquí para forzar ingreso de: "${txtDesc || txtSku}"`;
+                divRescate.onclick = function() {
+                    let skuForzado = txtSku.toUpperCase() || "S/N";
+                    let descForzada = txtDesc.toUpperCase() || "ARTÍCULO FORZADO";
+                    articuloSeleccionadoActual = skuForzado;
+                    
+                    // Lo metemos al maestro temporal para que no explote
+                    maestroArticulos[skuForzado] = { desc: descForzada };
+
+                    document.getElementById('contenedor-opciones-ia').innerHTML = `
+                        <div class="card-articulo" style="border-left-color: #ff4444; background-color: #3a1a1a;">
+                            <div>
+                                <div class="sku" style="color:#ff4444;">${skuForzado}</div>
+                                <div class="desc">${descForzada}</div>
+                            </div>
+                            <div class="cant-stock" style="color:#ff4444;">⚠️ FORZADO</div>
+                        </div>
+                    `;
+                    contenedorResultados.innerHTML = "";
+                    document.getElementById('buscar-sku').value = "";
+                    document.getElementById('buscar-desc').value = "";
+                };
+                contenedorResultados.appendChild(divRescate);
+            }
         }
 
-        // Lógica de agregado y tablas
         function agregarItemAlListado() {
             const inputCant = document.getElementById('cantidad-recibida');
             const cantidad = parseInt(inputCant.value);
 
             if (!articuloSeleccionadoActual) {
-                alert("❌ Seleccione un artículo antes de continuar.");
+                alert("❌ Seleccione o escriba un artículo antes de continuar.");
                 return;
             }
             if (isNaN(cantidad) || cantidad <= 0) {
@@ -314,7 +328,6 @@
             });
         }
 
-        // Cierre de pallets
         function cerrarPalletYFirma() {
             if (mercaderiaConsolidada.filter(i => i.pallet === contadorPallets).length === 0) {
                 alert("⚠️ No podés dejar un pallet vacío.");
@@ -330,7 +343,7 @@
                 alert("❌ No hay mercadería registrada.");
                 return;
             }
-            alert(`🎉 ¡RECEPCIÓN CONCLUIDA!\nTotal: ${mercaderiaConsolidada.length} ítems en ${contadorPallets} pallets.\nDatos consolidados.`);
+            alert(`🎉 ¡RECEPCIÓN CONCLUIDA!\nTotal: ${mercaderiaConsolidada.length} ítems en ${contadorPallets} pallets.`);
             mercaderiaConsolidada = [];
             contadorPallets = 1;
             document.getElementById('num-pallet-actual').innerText = contadorPallets;
