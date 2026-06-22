@@ -13,6 +13,14 @@
         .btn-verde { background-color: #1e7e34; color: white; width: 100%; padding: 20px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; display: block; box-sizing: border-box; }
         .btn-azul { background-color: #0056b3; color: white; width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
         .btn-gris { background-color: #444; color: white; width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        
+        /* ESTILOS NUEVOS PARA BOTONES TÁCTILES Y SLIDER */
+        .btn-group { display: flex; gap: 5px; margin-bottom: 15px; }
+        .btn-selectable { flex: 1; background-color: #2b2b2b; color: #aaa; border: 1px solid #444; padding: 12px 5px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; text-align: center; transition: 0.2s; }
+        .btn-selectable.active { background-color: #0056b3; color: white; border-color: #007bff; }
+        .slider { -webkit-appearance: none; width: 100%; height: 8px; border-radius: 5px; background: #333; outline: none; margin-bottom: 20px; margin-top: 10px; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 25px; height: 25px; border-radius: 50%; background: #ffc107; cursor: pointer; }
+        
         .preview-foto { width: 100%; max-height: 200px; object-fit: contain; margin-top: 10px; display: none; border-radius: 5px; border: 1px solid #444; }
         .estado { background-color: #2d2d2d; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-top: 10px; font-size: 14px; }
         .card-articulo { background-color: #252525; border-left: 5px solid #28a745; padding: 12px; margin-bottom: 10px; border-radius: 0 5px 5px 0; display: flex; justify-content: space-between; align-items: center; }
@@ -22,8 +30,7 @@
         .cant-stock { color: #28a745; font-weight: bold; text-align: right; font-size: 16px; }
         .control-navegacion { display: flex; justify-content: space-between; align-items: center; background-color: #252525; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
         .btn-nav { background-color: #444; color: white; border: none; padding: 10px 20px; font-weight: bold; font-size: 16px; border-radius: 3px; cursor: pointer; }
-        .input-manual { width: 100%; padding: 10px; box-sizing: border-box; background-color: #2b2b2b; color: white; border: 1px solid #444; border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
-        select.input-manual { appearance: none; -webkit-appearance: none; }
+        .input-manual { width: 100%; padding: 12px; box-sizing: border-box; background-color: #2b2b2b; color: white; border: 1px solid #444; border-radius: 4px; margin-bottom: 15px; font-size: 14px; }
         .tabla-resumen { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .tabla-resumen th { background-color: #333; text-align: left; padding: 8px; font-size: 12px; color: #aaa; }
         .tabla-resumen td { padding: 10px 8px; border-bottom: 1px solid #222; font-size: 14px; }
@@ -52,23 +59,23 @@
             <input type="text" class="input-manual" id="input-ayudantes" placeholder="Ej: Pedro, Luis (Opcional)">
 
             <label class="etiqueta">Tipo de Transporte</label>
-            <select class="input-manual" id="select-transporte">
-                <option value="" disabled selected>Seleccione transporte...</option>
-                <option value="Camión Proveedor">Camión Proveedor</option>
-                <option value="Flete Tercerizado">Flete Tercerizado</option>
-                <option value="Expreso">Expreso / Logística</option>
-                <option value="Utilitario / Chata">Utilitario / Chata</option>
-            </select>
+            <div class="btn-group">
+                <button class="btn-selectable active" onclick="seleccionarBoton(this, 'transporte', 'Camión')">Camión</button>
+                <button class="btn-selectable" onclick="seleccionarBoton(this, 'transporte', 'Flete')">Flete</button>
+                <button class="btn-selectable" onclick="seleccionarBoton(this, 'transporte', 'Utilitario')">Utilitario</button>
+            </div>
 
             <label class="etiqueta">Condición de la Carga</label>
-            <select class="input-manual" id="select-carga">
-                <option value="" disabled selected>Seleccione tipo de carga...</option>
-                <option value="Palletizado">Palletizado</option>
-                <option value="A Granel (Cajas sueltas)">A Granel (Cajas sueltas)</option>
-                <option value="Mixto">Mixto</option>
-            </select>
+            <div class="btn-group">
+                <button class="btn-selectable active" onclick="seleccionarBoton(this, 'carga', 'Palletizado')">Palletizado</button>
+                <button class="btn-selectable" onclick="seleccionarBoton(this, 'carga', 'Granel')">Granel</button>
+                <button class="btn-selectable" onclick="seleccionarBoton(this, 'carga', 'Mixto')">Mixto</button>
+            </div>
 
-            <button class="btn-verde" onclick="guardarDatosOperacion()">✅ CONTINUAR</button>
+            <label class="etiqueta">Pallets Declarados en Remito: <span id="valor-pallets" style="color:#ffc107; font-size:16px;">1</span></label>
+            <input type="range" id="slide-pallets" min="1" max="30" value="1" class="slider" oninput="actualizarSlider(this.value)">
+
+            <button class="btn-verde" style="margin-top:20px;" onclick="guardarDatosOperacion()">✅ CONTINUAR</button>
         </div>
     </div>
 
@@ -103,7 +110,7 @@
 
         <div class="panel" style="border-color: #ffc107;">
             <div class="panel-titulo" style="color: #ffc107;">⌨️ Carga Manual Alternativa</div>
-            <input type="text" class="input-manual" id="buscar-sku" placeholder="Buscar por Código SKU..." oninput="filtrarMaestroManual()">
+            <input type="text" class="input-manual" id="buscar-sku" placeholder="Buscar por Código SKU..." oninput="filtrarMaestroManual()" style="margin-bottom: 5px;">
             <input type="text" class="input-manual" id="buscar-desc" placeholder="Buscar o Escribir Descripción..." oninput="filtrarMaestroManual()">
             
             <div id="resultado-busqueda-manual" style="max-height: 120px; overflow-y: auto; margin-bottom: 10px;"></div>
@@ -158,12 +165,13 @@
         let mercaderiaConsolidada = []; 
         let contadorPallets = 1;
 
-        // Variables para la cabecera de la operación
+        // Variables de la cabecera predeterminadas
         let opCabecera = {
             responsable: "",
             ayudantes: "",
-            transporte: "",
-            carga: ""
+            transporte: "Camión",
+            carga: "Palletizado",
+            palletsDeclarados: 1
         };
 
         function cargarCatalogoEmpresa() {
@@ -186,22 +194,31 @@
 
         function volverAlMenu() { cambiarPantalla('vista-menu'); }
 
-        // Función para guardar los datos de la cabecera y avanzar
+        // FUNCIONES DE DISEÑO TÁCTIL (BOTONES Y SLIDER)
+        function seleccionarBoton(elemento, categoria, valor) {
+            let botones = elemento.parentElement.children;
+            for(let i=0; i<botones.length; i++) {
+                botones[i].classList.remove('active');
+            }
+            elemento.classList.add('active');
+
+            if(categoria === 'transporte') opCabecera.transporte = valor;
+            if(categoria === 'carga') opCabecera.carga = valor;
+        }
+
+        function actualizarSlider(valor) {
+            document.getElementById('valor-pallets').innerText = valor;
+            opCabecera.palletsDeclarados = parseInt(valor);
+        }
+
         function guardarDatosOperacion() {
             const resp = document.getElementById('input-responsable').value.trim();
-            const transp = document.getElementById('select-transporte').value;
-            const carga = document.getElementById('select-carga').value;
-
-            if(!resp || !transp || !carga) {
-                alert("⚠️ Por favor complete el Responsable, Transporte y Carga para continuar.");
+            if(!resp) {
+                alert("⚠️ Por favor ingrese el Responsable de la Recepción.");
                 return;
             }
-
             opCabecera.responsable = resp;
             opCabecera.ayudantes = document.getElementById('input-ayudantes').value.trim() || "Ninguno";
-            opCabecera.transporte = transp;
-            opCabecera.carga = carga;
-
             cambiarPantalla('vista-recepcion');
         }
 
@@ -410,18 +427,13 @@
                 alert("❌ No hay mercadería registrada.");
                 return;
             }
-            alert(`🎉 ¡RECEPCIÓN CONCLUIDA!\nResponsable: ${opCabecera.responsable}\nTransporte: ${opCabecera.transporte}\nTotal: ${mercaderiaConsolidada.length} ítems en ${contadorPallets} pallets.`);
+            alert(`🎉 ¡RECEPCIÓN CONCLUIDA!\nResp: ${opCabecera.responsable} | Transp: ${opCabecera.transporte}\nDeclarados: ${opCabecera.palletsDeclarados} Pallets\nTotal Físico: ${mercaderiaConsolidada.length} ítems en ${contadorPallets} pallets armados.`);
             
-            // Limpieza de variables para el siguiente camión
             mercaderiaConsolidada = [];
             contadorPallets = 1;
             document.getElementById('num-pallet-actual').innerText = contadorPallets;
-            
-            // Limpiamos los inputs de cabecera
             document.getElementById('input-responsable').value = "";
             document.getElementById('input-ayudantes').value = "";
-            document.getElementById('select-transporte').value = "";
-            document.getElementById('select-carga').value = "";
 
             actualizarTablaResumen();
             volverAlMenu();
