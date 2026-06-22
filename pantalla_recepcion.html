@@ -19,13 +19,16 @@
         .sku { font-weight: bold; color: #28a745; font-size: 16px; }
         .desc { font-size: 13px; color: #ccc; margin-top: 3px; }
         .cant-stock { color: #28a745; font-weight: bold; text-align: right; font-size: 16px; }
-        .control-navegacion { display: flex; justify-content: space-between; align-items: center; background-color: #252525; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
-        .btn-nav { background-color: #444; color: white; border: none; padding: 10px 20px; font-weight: bold; font-size: 16px; border-radius: 3px; cursor: pointer; }
+        
+        /* DISEÑO DE CONTENEDOR EN LÍNEA PARA LOS BOTONES */
+        .control-navegacion { display: flex; justify-content: space-between; align-items: center; background-color: #252525; padding: 10px; border-radius: 5px; margin-bottom: 15px; gap: 10px; }
+        .btn-nav { background-color: #444; color: white; border: none; padding: 12px 15px; font-weight: bold; font-size: 14px; border-radius: 3px; cursor: pointer; flex: 1; text-align: center; }
         .input-manual { width: 100%; padding: 10px; box-sizing: border-box; background-color: #2b2b2b; color: white; border: 1px solid #444; border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
         .tabla-resumen { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .tabla-resumen th { background-color: #333; text-align: left; padding: 8px; font-size: 12px; color: #aaa; }
         .tabla-resumen td { padding: 10px 8px; border-bottom: 1px solid #222; font-size: 14px; }
         .badge-pallet { background-color: #ffc107; color: black; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 3px; }
+        .contenedor-fila-botones { display: flex; gap: 10px; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -56,9 +59,9 @@
             <div id="contenedor-opciones-ia"></div>
             
             <div class="control-navegacion">
-                <button class="btn-nav" id="btn-prev" onclick="navegarArticulo(-1)">◀ ANTERIOR</button>
-                <div id="indicador-posicion" style="font-size: 14px; font-weight: bold; color: #ffc107;">Opción 0 de 0</div>
-                <button class="btn-nav" id="btn-next" onclick="navegangarArticulo(1)">SIGUIENTE ▶</button>
+                <button class="btn-nav" id="btn-prev" onclick="navegarArticulo(-1)">◀ ANT.</button>
+                <div id="indicador-posicion" style="font-size: 13px; font-weight: bold; color: #ffc107; min-width: 90px; text-align: center;">Opción 0 de 0</div>
+                <button class="btn-nav" id="btn-next" onclick="navegarArticulo(1)">SIG. ▶</button>
             </div>
         </div>
 
@@ -74,9 +77,9 @@
             <div class="panel-titulo">🔢 Cantidad Recibida</div>
             <input type="number" class="input-manual" id="cantidad-recibida" placeholder="Ingrese cantidad..." style="font-size: 20px; text-align: center; font-weight: bold; color: #28a745;">
             
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn-azul" style="background-color: #218838; margin:0; flex:1; padding: 18px;" onclick="agregarItemAlListado()">➕ AGREGAR ARTÍCULO</button>
-                <button class="btn-azul" style="background-color: #ffc107; color: black; margin:0; flex:1; padding: 18px;" onclick="cambiarPantalla('vista-palletizado')">👀 VER RESUMEN</button>
+            <div class="contenedor-fila-botones">
+                <button class="btn-azul" style="background-color: #218838; margin:0; flex:1; padding: 15px; font-size: 14px;" onclick="agregarItemAlListado()">➕ AGREGAR</button>
+                <button class="btn-azul" style="background-color: #ffc107; color: black; margin:0; flex:1; padding: 15px; font-size: 14px;" onclick="cambiarPantalla('vista-palletizado')">👀 RESUMEN</button>
             </div>
         </div>
     </div>
@@ -87,9 +90,9 @@
         <div class="panel">
             <div class="panel-titulo">📦 Construyendo Pallet Activo</div>
             <h2 style="margin:0; text-align:center; color:#ffc107;">PALLET N° <span id="num-pallet-actual">1</span></h2>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <div class="contenedor-fila-botones">
                 <button class="btn-azul" style="background-color: #6c757d; margin:0; flex:1;" onclick="cerrarPalletYFirma()">📦 SIG. PALLET</button>
-                <button class="btn-azul" style="background-color: #28a745; margin:0; flex:1;" onclick="finalizarCargaEntera()">💾 FINALIZAR CARGA</button>
+                <button class="btn-azul" style="background-color: #28a745; margin:0; flex:1;" onclick="finalizarCargaEntera()">💾 FINALIZAR</button>
             </div>
         </div>
 
@@ -119,7 +122,6 @@
         let mercaderiaConsolidada = []; 
         let contadorPallets = 1;
 
-        // Bajamos el catálogo de la empresa al arrancar la pantalla
         function cargarCatalogoEmpresa() {
             fetch(`${RUTA_MOTOR}/api/articulos`)
                 .then(res => res.json())
@@ -128,7 +130,7 @@
                     console.log("✅ Catálogo sincronizado con el motor."); 
                 })
                 .catch(err => {
-                    console.log("⚠️ No se pudo conectar de entrada.");
+                    console.log("⚠️ Sincronización en espera.");
                 });
         }
 
@@ -181,8 +183,8 @@
                 })
                 .catch(err => {
                     divEstado.style.backgroundColor = '#b30000';
-                    divEstado.innerText = "❌ Error de red: El motor en la PC no responde.";
-                    alert("❌ No se pudo conectar con el motor WMS de la PC. Verificá que el CMD tenga el cohete encendido.");
+                    divEstado.innerText = "❌ Error de red con el motor.";
+                    alert("❌ Error de comunicación con la PC.");
                 });
         }
 
