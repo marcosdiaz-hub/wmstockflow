@@ -10,25 +10,8 @@
         .btn-salir { position: absolute; right: 10px; top: 10px; background-color: #b30000; color: white; border: none; padding: 5px 10px; font-weight: bold; border-radius: 3px; cursor: pointer; }
         .panel { background-color: #1e1e1e; border: 1px dashed #444; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
         .panel-titulo { font-size: 13px; font-weight: bold; text-transform: uppercase; color: #bbb; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        
-        /* BOTÓN INICIO REPARADO Y CENTRADO */
-        .btn-verde { 
-            background-color: #1e7e34; 
-            color: white; 
-            width: 100%; 
-            padding: 20px; 
-            font-size: 18px; 
-            font-weight: bold; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            text-transform: uppercase;
-            box-sizing: border-box;
-            display: block;
-            text-align: center;
-        }
-        
-        .btn-azul { background-color: #0056b3; color: white; width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; box-sizing: border-box; }
+        .btn-verde { background-color: #1e7e34; color: white; width: 100%; padding: 20px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .btn-azul { background-color: #0056b3; color: white; width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
         .preview-foto { width: 100%; max-height: 200px; object-fit: contain; margin-top: 10px; display: none; border-radius: 5px; border: 1px solid #444; }
         .estado { background-color: #2d2d2d; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-top: 10px; font-size: 14px; }
         .card-articulo { background-color: #252525; border-left: 5px solid #28a745; padding: 12px; margin-bottom: 10px; border-radius: 0 5px 5px 0; display: flex; justify-content: space-between; align-items: center; }
@@ -43,17 +26,15 @@
         .tabla-resumen th { background-color: #333; text-align: left; padding: 8px; font-size: 12px; color: #aaa; }
         .tabla-resumen td { padding: 10px 8px; border-bottom: 1px solid #222; font-size: 14px; }
         .badge-pallet { background-color: #ffc107; color: black; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 3px; }
-        
-        /* ALERTA DE ERROR ESTILIZADA EN CASO DE DESCONEXIÓN RECTIFICADA */
-        .alerta-error { background-color: #b30000; color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 15px; font-size: 13px; display: none; }
     </style>
 </head>
 <body>
 
     <div id="vista-menu">
         <div class="header">SISTEMA WMS - CENTUM</div>
-        <div id="cartel-desconectado" class="alerta-error">⚠️ ALERTA: Sin comunicación con la Base de Datos local. Verificá Ngrok.</div>
-        <button class="btn-verde" id="btn-comenzar" onclick="cambiarPantalla('vista-recepcion')">📥 Comenzar Recepción</button>
+        <div style="padding: 20px 5px;">
+            <button class="btn-verde" onclick="cambiarPantalla('vista-recepcion')">📥 Comenzar Recepción</button>
+        </div>
     </div>
 
     <div id="vista-recepcion" style="display:none;">
@@ -77,7 +58,7 @@
             <div class="control-navegacion">
                 <button class="btn-nav" id="btn-prev" onclick="navegarArticulo(-1)">◀ ANTERIOR</button>
                 <div id="indicador-posicion" style="font-size: 14px; font-weight: bold; color: #ffc107;">Opción 0 de 0</div>
-                <button class="btn-nav" id="btn-next" onclick="navegarArticulo(1)">SIGUIENTE ▶</button>
+                <button class="btn-nav" id="btn-next" onclick="navegangarArticulo(1)">SIGUIENTE ▶</button>
             </div>
         </div>
 
@@ -128,34 +109,30 @@
     </div>
 
     <script>
-        const RUTA_MOTOR = "https://equate-dig-finless.ngrok-free.dev"; // Tu puente Ngrok actual fijo
+        const RUTA_MOTOR = "https://equate-dig-finless.ngrok-free.dev"; // Tu puente Ngrok
 
         let maestroArticulos = {};      
         let opcionesIA = [];           
         let indiceActualIA = 0;        
         let articuloSeleccionadoActual = null; 
-        
         let remitoGlobal = "";
         let mercaderiaConsolidada = []; 
         let contadorPallets = 1;
 
-        // SINCRONIZACIÓN SILENCIOSA DE ARRANQUE REPARADA
-        window.onload = function() {
+        // Bajamos el catálogo de la empresa al arrancar la pantalla
+        function cargarCatalogoEmpresa() {
             fetch(`${RUTA_MOTOR}/api/articulos`)
-                .then(res => {
-                    if (!res.ok) throw new Error();
-                    return res.json();
-                })
+                .then(res => res.json())
                 .then(data => { 
                     maestroArticulos = data; 
-                    console.log("✅ Catálogo sincronizado.");
-                    document.getElementById('cartel-desconectado').style.display = 'none';
+                    console.log("✅ Catálogo sincronizado con el motor."); 
                 })
                 .catch(err => {
-                    console.log("❌ Error de red.");
-                    document.getElementById('cartel-desconectado').style.display = 'block';
+                    console.log("⚠️ No se pudo conectar de entrada.");
                 });
-        };
+        }
+
+        window.onload = cargarCatalogoEmpresa;
 
         function cambiarPantalla(idPantalla) {
             document.getElementById('vista-menu').style.display = 'none';
@@ -179,4 +156,169 @@
             divEstado.style.backgroundColor = '#0056b3';
             divEstado.innerText = "⏳ Procesando remito con Inteligencia Artificial...";
 
-            const formData = new FormData
+            const formData = new FormData();
+            formData.append('foto_remito', input.files[0]);
+
+            fetch(`${RUTA_MOTOR}/api/ocr`, { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    divEstado.style.backgroundColor = '#1e7e34';
+                    
+                    if (data.orden_compra === "FALTANTE") {
+                        alert("🚨 ATENCIÓN: Este remito NO TIENE una Orden de Compra asociada en sistema. Se disparará una alerta por mail.");
+                    } else {
+                        alert(`🎯 ¡ÉXITO! Se detectó la Orden de Compra asociada: ${data.orden_compra}`);
+                    }
+                    
+                    remitoGlobal = data.numero_remito;
+                    opcionesIA = Object.keys(data.articulos_detectados);
+                    indiceActualIA = 0;
+
+                    setTimeout(() => {
+                        cambiarPantalla('vista-consolidacion');
+                        renderizarOpcionesIA();
+                    }, 1000);
+                })
+                .catch(err => {
+                    divEstado.style.backgroundColor = '#b30000';
+                    divEstado.innerText = "❌ Error de red: El motor en la PC no responde.";
+                    alert("❌ No se pudo conectar con el motor WMS de la PC. Verificá que el CMD tenga el cohete encendido.");
+                });
+        }
+
+        function renderizarOpcionesIA() {
+            const contenedor = document.getElementById('contenedor-opciones-ia');
+            const indicador = document.getElementById('indicador-posicion');
+            contenedor.innerHTML = "";
+
+            if (opcionesIA.length === 0) {
+                contenedor.innerHTML = `<div style="text-align:center; color:#aaa; padding:10px; font-size:14px;">❌ La IA no detectó artículos en el maestro.<br>Cargue el producto manualmente abajo.</div>`;
+                indicador.innerText = "Opción 0 de 0";
+                articuloSeleccionadoActual = null;
+                return;
+            }
+
+            const skuDetectado = opcionesIA[indiceActualIA];
+            const infoArt = maestroArticulos[skuDetectado] || { desc: "Artículo Desconocido" };
+            articuloSeleccionadoActual = skuDetectado;
+
+            contenedor.innerHTML = `
+                <div class="card-articulo seleccionado">
+                    <div>
+                        <div class="sku">${skuDetectado}</div>
+                        <div class="desc">${infoArt.desc}</div>
+                    </div>
+                    <div class="cant-stock">🤖 IA</div>
+                </div>
+            `;
+            indicador.innerText = `Opción ${indiceActualIA + 1} de ${opcionesIA.length}`;
+        }
+
+        function navegarArticulo(direccion) {
+            if (opcionesIA.length === 0) return;
+            indiceActualIA += direccion;
+            if (indiceActualIA < 0) indiceActualIA = opcionesIA.length - 1;
+            if (indiceActualIA >= opcionesIA.length) indiceActualIA = 0;
+            renderizarOpcionesIA();
+        }
+
+        function filtrarMaestroManual() {
+            const txtSku = document.getElementById('buscar-sku').value.toLowerCase();
+            const txtDesc = document.getElementById('buscar-desc').value.toLowerCase();
+            const contenedorResultados = document.getElementById('resultado-busqueda-manual');
+            
+            contenedorResultados.innerHTML = "";
+            if (txtSku === "" && txtDesc === "") return;
+
+            Object.keys(maestroArticulos).forEach(sku => {
+                const descripcion = maestroArticulos[sku].desc.toLowerCase();
+                const skuMin = sku.toLowerCase();
+
+                if ((txtSku !== "" && skuMin.includes(txtSku)) || (txtDesc !== "" && descripcion.includes(txtDesc))) {
+                    const divRes = document.createElement('div');
+                    divRes.style = "background:#333; padding:10px; margin-bottom:5px; border-radius:3px; cursor:pointer; font-size:13px; border-left: 3px solid #ffc107;";
+                    divRes.innerHTML = `<strong>${sku}</strong> - ${maestroArticulos[sku].desc}`;
+                    divRes.onclick = function() {
+                        articuloSeleccionadoActual = sku;
+                        document.getElementById('contenedor-opciones-ia').innerHTML = `
+                            <div class="card-articulo" style="border-left-color: #ffc107; background-color: #3a321d;">
+                                <div>
+                                    <div class="sku" style="color:#ffc107;">${sku}</div>
+                                    <div class="desc">${maestroArticulos[sku].desc}</div>
+                                </div>
+                                <div class="cant-stock" style="color:#ffc107;">✍️ MANUAL</div>
+                            </div>
+                        `;
+                        contenedorResultados.innerHTML = "";
+                        document.getElementById('buscar-sku').value = "";
+                        document.getElementById('buscar-desc').value = "";
+                    };
+                    contenedorResultados.appendChild(divRes);
+                }
+            });
+        }
+
+        function agregarItemAlListado() {
+            const inputCant = document.getElementById('cantidad-recibida');
+            const cantidad = parseInt(inputCant.value);
+
+            if (!articuloSeleccionadoActual) {
+                alert("❌ Seleccione un artículo antes de continuar.");
+                return;
+            }
+            if (isNaN(cantidad) || cantidad <= 0) {
+                alert("❌ Ingrese una cantidad válida.");
+                return;
+            }
+
+            mercaderiaConsolidada.push({
+                sku: articuloSeleccionadoActual,
+                descripcion: maestroArticulos[articuloSeleccionadoActual].desc,
+                cant: cantidad,
+                pallet: contadorPallets
+            });
+
+            alert(`✅ Registrado: ${articuloSeleccionadoActual} x ${cantidad} (Asignado al Pallet ${contadorPallets})`);
+            inputCant.value = "";
+            actualizarTablaResumen();
+        }
+
+        function actualizarTablaResumen() {
+            const tbody = document.getElementById('tabla-items-recibidos');
+            tbody.innerHTML = "";
+            mercaderiaConsolidada.forEach(item => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td><strong>${item.sku}</strong><br><span style="font-size:11px; color:#aaa;">${item.descripcion}</span></td>
+                    <td><span style="color:#28a745; font-weight:bold;">${item.cant}</span></td>
+                    <td><span class="badge-pallet">PALLET ${item.pallet}</span></td>
+                `;
+                tbody.appendChild(fila);
+            });
+        }
+
+        function cerrarPalletYFirma() {
+            if (mercaderiaConsolidada.filter(i => i.pallet === contadorPallets).length === 0) {
+                alert("⚠️ No podés dejar un pallet vacío.");
+                return;
+            }
+            alert(`📦 Pallet N° ${contadorPallets} cerrado. Iniciando Pallet N° ${contadorPallets + 1}.`);
+            contadorPallets++;
+            document.getElementById('num-pallet-actual').innerText = contadorPallets;
+        }
+
+        function finalizarCargaEntera() {
+            if (mercaderiaConsolidada.length === 0) {
+                alert("❌ No hay mercadería registrada.");
+                return;
+            }
+            alert(`🎉 ¡RECEPCIÓN CONCLUIDA!\nTotal: ${mercaderiaConsolidada.length} ítems en ${contadorPallets} pallets.\nDatos consolidados.`);
+            mercaderiaConsolidada = [];
+            contadorPallets = 1;
+            document.getElementById('num-pallet-actual').innerText = contadorPallets;
+            actualizarTablaResumen();
+            volverAlMenu();
+        }
+    </script>
+</body>
+</html>
