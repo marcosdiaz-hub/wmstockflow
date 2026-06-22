@@ -10,25 +10,34 @@
         .btn-salir { position: absolute; right: 10px; top: 10px; background-color: #b30000; color: white; border: none; padding: 5px 10px; font-weight: bold; border-radius: 3px; cursor: pointer; }
         .panel { background-color: #1e1e1e; border: 1px dashed #444; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
         .panel-titulo { font-size: 13px; font-weight: bold; text-transform: uppercase; color: #bbb; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        
+        /* BOTONES PRINCIPALES */
         .btn-verde { background-color: #1e7e34; color: white; width: 100%; padding: 20px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         .btn-azul { background-color: #0056b3; color: white; width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        
         .preview-foto { width: 100%; max-height: 200px; object-fit: contain; margin-top: 10px; display: none; border-radius: 5px; border: 1px solid #444; }
         .estado { background-color: #2d2d2d; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-top: 10px; font-size: 14px; }
+        
+        /* TARJETAS DE ARTÍCULOS */
         .card-articulo { background-color: #252525; border-left: 5px solid #28a745; padding: 12px; margin-bottom: 10px; border-radius: 0 5px 5px 0; display: flex; justify-content: space-between; align-items: center; }
         .card-articulo.seleccionado { background-color: #2e4a33; border-left-color: #218838; }
         .sku { font-weight: bold; color: #28a745; font-size: 16px; }
         .desc { font-size: 13px; color: #ccc; margin-top: 3px; }
         .cant-stock { color: #28a745; font-weight: bold; text-align: right; font-size: 16px; }
         
-        /* DISEÑO DE CONTENEDOR EN LÍNEA PARA LOS BOTONES */
-        .control-navegacion { display: flex; justify-content: space-between; align-items: center; background-color: #252525; padding: 10px; border-radius: 5px; margin-bottom: 15px; gap: 10px; }
-        .btn-nav { background-color: #444; color: white; border: none; padding: 12px 15px; font-weight: bold; font-size: 14px; border-radius: 3px; cursor: pointer; flex: 1; text-align: center; }
+        /* DISTRIBUCIÓN HORIZONTAL ESTRICTA (FLEXBOX) */
+        .control-navegacion { display: flex; justify-content: space-between; align-items: center; background-color: #252525; padding: 8px 12px; border-radius: 5px; margin-bottom: 15px; gap: 10px; }
+        .btn-nav { background-color: #444; color: white; border: none; padding: 12px 0; font-weight: bold; font-size: 14px; border-radius: 4px; cursor: pointer; flex: 1; text-align: center; width: 100%; }
+        
+        .contenedor-fila-botones { display: flex; gap: 10px; margin-top: 15px; width: 100%; }
+        .btn-accion-mitad { color: white; padding: 16px 0; font-size: 14px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; flex: 1; text-align: center; text-transform: uppercase; }
+        
+        /* TABLAS Y BUSCADOR */
         .input-manual { width: 100%; padding: 10px; box-sizing: border-box; background-color: #2b2b2b; color: white; border: 1px solid #444; border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
         .tabla-resumen { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .tabla-resumen th { background-color: #333; text-align: left; padding: 8px; font-size: 12px; color: #aaa; }
         .tabla-resumen td { padding: 10px 8px; border-bottom: 1px solid #222; font-size: 14px; }
         .badge-pallet { background-color: #ffc107; color: black; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 3px; }
-        .contenedor-fila-botones { display: flex; gap: 10px; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -60,7 +69,7 @@
             
             <div class="control-navegacion">
                 <button class="btn-nav" id="btn-prev" onclick="navegarArticulo(-1)">◀ ANT.</button>
-                <div id="indicador-posicion" style="font-size: 13px; font-weight: bold; color: #ffc107; min-width: 90px; text-align: center;">Opción 0 de 0</div>
+                <div id="indicador-posicion" style="font-size: 14px; font-weight: bold; color: #ffc107; min-width: 100px; text-align: center;">Opción 0 de 0</div>
                 <button class="btn-nav" id="btn-next" onclick="navegarArticulo(1)">SIG. ▶</button>
             </div>
         </div>
@@ -78,8 +87,8 @@
             <input type="number" class="input-manual" id="cantidad-recibida" placeholder="Ingrese cantidad..." style="font-size: 20px; text-align: center; font-weight: bold; color: #28a745;">
             
             <div class="contenedor-fila-botones">
-                <button class="btn-azul" style="background-color: #218838; margin:0; flex:1; padding: 15px; font-size: 14px;" onclick="agregarItemAlListado()">➕ AGREGAR</button>
-                <button class="btn-azul" style="background-color: #ffc107; color: black; margin:0; flex:1; padding: 15px; font-size: 14px;" onclick="cambiarPantalla('vista-palletizado')">👀 RESUMEN</button>
+                <button class="btn-accion-mitad" style="background-color: #218838;" onclick="agregarItemAlListado()">➕ AGREGAR</button>
+                <button class="btn-accion-mitad" style="background-color: #ffc107; color: black;" onclick="cambiarPantalla('vista-palletizado')">👀 RESUMEN</button>
             </div>
         </div>
     </div>
@@ -91,8 +100,8 @@
             <div class="panel-titulo">📦 Construyendo Pallet Activo</div>
             <h2 style="margin:0; text-align:center; color:#ffc107;">PALLET N° <span id="num-pallet-actual">1</span></h2>
             <div class="contenedor-fila-botones">
-                <button class="btn-azul" style="background-color: #6c757d; margin:0; flex:1;" onclick="cerrarPalletYFirma()">📦 SIG. PALLET</button>
-                <button class="btn-azul" style="background-color: #28a745; margin:0; flex:1;" onclick="finalizarCargaEntera()">💾 FINALIZAR</button>
+                <button class="btn-accion-mitad" style="background-color: #6c757d;" onclick="cerrarPalletYFirma()">📦 SIG. PALLET</button>
+                <button class="btn-accion-mitad" style="background-color: #28a745;" onclick="finalizarCargaEntera()">💾 FINALIZAR</button>
             </div>
         </div>
 
@@ -112,7 +121,7 @@
     </div>
 
     <script>
-        const RUTA_MOTOR = "https://equate-dig-finless.ngrok-free.dev"; // Tu puente Ngrok
+        const RUTA_MOTOR = "https://equate-dig-finless.ngrok-free.dev"; // Tu puente Ngrok intacto
 
         let maestroArticulos = {};      
         let opcionesIA = [];           
@@ -122,6 +131,7 @@
         let mercaderiaConsolidada = []; 
         let contadorPallets = 1;
 
+        // Carga inicial del catálogo
         function cargarCatalogoEmpresa() {
             fetch(`${RUTA_MOTOR}/api/articulos`)
                 .then(res => res.json())
@@ -136,6 +146,7 @@
 
         window.onload = cargarCatalogoEmpresa;
 
+        // Navegación entre vistas
         function cambiarPantalla(idPantalla) {
             document.getElementById('vista-menu').style.display = 'none';
             document.getElementById('vista-recepcion').style.display = 'none';
@@ -146,6 +157,7 @@
 
         function volverAlMenu() { cambiarPantalla('vista-menu'); }
 
+        // Lógica de IA y lectura
         function procesarFoto(input) {
             if (!input.files || !input.files[0]) return;
             
@@ -188,6 +200,7 @@
                 });
         }
 
+        // Renderizar opciones enumeradas
         function renderizarOpcionesIA() {
             const contenedor = document.getElementById('contenedor-opciones-ia');
             const indicador = document.getElementById('indicador-posicion');
@@ -224,6 +237,7 @@
             renderizarOpcionesIA();
         }
 
+        // Buscador Manual Predictivo
         function filtrarMaestroManual() {
             const txtSku = document.getElementById('buscar-sku').value.toLowerCase();
             const txtDesc = document.getElementById('buscar-desc').value.toLowerCase();
@@ -245,82 +259,3 @@
                         document.getElementById('contenedor-opciones-ia').innerHTML = `
                             <div class="card-articulo" style="border-left-color: #ffc107; background-color: #3a321d;">
                                 <div>
-                                    <div class="sku" style="color:#ffc107;">${sku}</div>
-                                    <div class="desc">${maestroArticulos[sku].desc}</div>
-                                </div>
-                                <div class="cant-stock" style="color:#ffc107;">✍️ MANUAL</div>
-                            </div>
-                        `;
-                        contenedorResultados.innerHTML = "";
-                        document.getElementById('buscar-sku').value = "";
-                        document.getElementById('buscar-desc').value = "";
-                    };
-                    contenedorResultados.appendChild(divRes);
-                }
-            });
-        }
-
-        function agregarItemAlListado() {
-            const inputCant = document.getElementById('cantidad-recibida');
-            const cantidad = parseInt(inputCant.value);
-
-            if (!articuloSeleccionadoActual) {
-                alert("❌ Seleccione un artículo antes de continuar.");
-                return;
-            }
-            if (isNaN(cantidad) || cantidad <= 0) {
-                alert("❌ Ingrese una cantidad válida.");
-                return;
-            }
-
-            mercaderiaConsolidada.push({
-                sku: articuloSeleccionadoActual,
-                descripcion: maestroArticulos[articuloSeleccionadoActual].desc,
-                cant: cantidad,
-                pallet: contadorPallets
-            });
-
-            alert(`✅ Registrado: ${articuloSeleccionadoActual} x ${cantidad} (Asignado al Pallet ${contadorPallets})`);
-            inputCant.value = "";
-            actualizarTablaResumen();
-        }
-
-        function actualizarTablaResumen() {
-            const tbody = document.getElementById('tabla-items-recibidos');
-            tbody.innerHTML = "";
-            mercaderiaConsolidada.forEach(item => {
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td><strong>${item.sku}</strong><br><span style="font-size:11px; color:#aaa;">${item.descripcion}</span></td>
-                    <td><span style="color:#28a745; font-weight:bold;">${item.cant}</span></td>
-                    <td><span class="badge-pallet">PALLET ${item.pallet}</span></td>
-                `;
-                tbody.appendChild(fila);
-            });
-        }
-
-        function cerrarPalletYFirma() {
-            if (mercaderiaConsolidada.filter(i => i.pallet === contadorPallets).length === 0) {
-                alert("⚠️ No podés dejar un pallet vacío.");
-                return;
-            }
-            alert(`📦 Pallet N° ${contadorPallets} cerrado. Iniciando Pallet N° ${contadorPallets + 1}.`);
-            contadorPallets++;
-            document.getElementById('num-pallet-actual').innerText = contadorPallets;
-        }
-
-        function finalizarCargaEntera() {
-            if (mercaderiaConsolidada.length === 0) {
-                alert("❌ No hay mercadería registrada.");
-                return;
-            }
-            alert(`🎉 ¡RECEPCIÓN CONCLUIDA!\nTotal: ${mercaderiaConsolidada.length} ítems en ${contadorPallets} pallets.\nDatos consolidados.`);
-            mercaderiaConsolidada = [];
-            contadorPallets = 1;
-            document.getElementById('num-pallet-actual').innerText = contadorPallets;
-            actualizarTablaResumen();
-            volverAlMenu();
-        }
-    </script>
-</body>
-</html>
