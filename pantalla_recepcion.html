@@ -12,6 +12,7 @@
         .panel-titulo { font-size: 13px; font-weight: bold; text-transform: uppercase; color: #bbb; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
         .btn-verde { background-color: #1e7e34; color: white; width: 100%; padding: 20px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; display: block; box-sizing: border-box; }
         .btn-azul { background-color: #0056b3; color: white; width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        .btn-gris { background-color: #444; color: white; width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
         .preview-foto { width: 100%; max-height: 200px; object-fit: contain; margin-top: 10px; display: none; border-radius: 5px; border: 1px solid #444; }
         .estado { background-color: #2d2d2d; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-top: 10px; font-size: 14px; }
         .card-articulo { background-color: #252525; border-left: 5px solid #28a745; padding: 12px; margin-bottom: 10px; border-radius: 0 5px 5px 0; display: flex; justify-content: space-between; align-items: center; }
@@ -22,10 +23,12 @@
         .control-navegacion { display: flex; justify-content: space-between; align-items: center; background-color: #252525; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
         .btn-nav { background-color: #444; color: white; border: none; padding: 10px 20px; font-weight: bold; font-size: 16px; border-radius: 3px; cursor: pointer; }
         .input-manual { width: 100%; padding: 10px; box-sizing: border-box; background-color: #2b2b2b; color: white; border: 1px solid #444; border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
+        select.input-manual { appearance: none; -webkit-appearance: none; }
         .tabla-resumen { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .tabla-resumen th { background-color: #333; text-align: left; padding: 8px; font-size: 12px; color: #aaa; }
         .tabla-resumen td { padding: 10px 8px; border-bottom: 1px solid #222; font-size: 14px; }
         .badge-pallet { background-color: #ffc107; color: black; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 3px; }
+        label.etiqueta { font-size: 12px; color: #aaa; display: block; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -33,7 +36,39 @@
     <div id="vista-menu">
         <div class="header">SISTEMA WMS - CENTUM</div>
         <div style="padding: 20px 5px;">
-            <button class="btn-verde" onclick="cambiarPantalla('vista-recepcion')">📥 Comenzar Recepción</button>
+            <button class="btn-verde" onclick="cambiarPantalla('vista-datos-operacion')">📥 Comenzar Recepción</button>
+        </div>
+    </div>
+
+    <div id="vista-datos-operacion" style="display:none;">
+        <div class="header">DATOS DE OPERACIÓN<button class="btn-salir" onclick="volverAlMenu()">❌ SALIR</button></div>
+        <div class="panel">
+            <div class="panel-titulo">👷 Personal y Transporte</div>
+            
+            <label class="etiqueta">Responsable de Recepción</label>
+            <input type="text" class="input-manual" id="input-responsable" placeholder="Ej: Marcos, Juan...">
+
+            <label class="etiqueta">Ayudantes / Cuadrilla</label>
+            <input type="text" class="input-manual" id="input-ayudantes" placeholder="Ej: Pedro, Luis (Opcional)">
+
+            <label class="etiqueta">Tipo de Transporte</label>
+            <select class="input-manual" id="select-transporte">
+                <option value="" disabled selected>Seleccione transporte...</option>
+                <option value="Camión Proveedor">Camión Proveedor</option>
+                <option value="Flete Tercerizado">Flete Tercerizado</option>
+                <option value="Expreso">Expreso / Logística</option>
+                <option value="Utilitario / Chata">Utilitario / Chata</option>
+            </select>
+
+            <label class="etiqueta">Condición de la Carga</label>
+            <select class="input-manual" id="select-carga">
+                <option value="" disabled selected>Seleccione tipo de carga...</option>
+                <option value="Palletizado">Palletizado</option>
+                <option value="A Granel (Cajas sueltas)">A Granel (Cajas sueltas)</option>
+                <option value="Mixto">Mixto</option>
+            </select>
+
+            <button class="btn-verde" onclick="guardarDatosOperacion()">✅ CONTINUAR</button>
         </div>
     </div>
 
@@ -45,6 +80,10 @@
             <input type="file" id="input-camara" accept="image/*" capture="environment" style="display:none;" onchange="procesarFoto(this)">
             <img id="preview" class="preview-foto">
             <div id="estado-ocr" class="estado" style="display:none;">Esperando documento...</div>
+            
+            <hr style="border-color: #333; margin: 20px 0;">
+            
+            <button class="btn-gris" onclick="iniciarCargaManualDirecta()">✍️ CARGA MANUAL (SIN REMITO)</button>
         </div>
     </div>
 
@@ -119,22 +158,26 @@
         let mercaderiaConsolidada = []; 
         let contadorPallets = 1;
 
+        // Variables para la cabecera de la operación
+        let opCabecera = {
+            responsable: "",
+            ayudantes: "",
+            transporte: "",
+            carga: ""
+        };
+
         function cargarCatalogoEmpresa() {
             fetch(`${RUTA_MOTOR}/api/articulos`)
                 .then(res => res.json())
-                .then(data => { 
-                    maestroArticulos = data; 
-                    console.log("✅ Catálogo sincronizado."); 
-                })
-                .catch(err => {
-                    console.log("⚠️ Error sincronizando.");
-                });
+                .then(data => { maestroArticulos = data; })
+                .catch(err => { console.log("⚠️ Error sincronizando."); });
         }
 
         window.onload = cargarCatalogoEmpresa;
 
         function cambiarPantalla(idPantalla) {
             document.getElementById('vista-menu').style.display = 'none';
+            document.getElementById('vista-datos-operacion').style.display = 'none';
             document.getElementById('vista-recepcion').style.display = 'none';
             document.getElementById('vista-consolidacion').style.display = 'none';
             document.getElementById('vista-palletizado').style.display = 'none';
@@ -142,6 +185,33 @@
         }
 
         function volverAlMenu() { cambiarPantalla('vista-menu'); }
+
+        // Función para guardar los datos de la cabecera y avanzar
+        function guardarDatosOperacion() {
+            const resp = document.getElementById('input-responsable').value.trim();
+            const transp = document.getElementById('select-transporte').value;
+            const carga = document.getElementById('select-carga').value;
+
+            if(!resp || !transp || !carga) {
+                alert("⚠️ Por favor complete el Responsable, Transporte y Carga para continuar.");
+                return;
+            }
+
+            opCabecera.responsable = resp;
+            opCabecera.ayudantes = document.getElementById('input-ayudantes').value.trim() || "Ninguno";
+            opCabecera.transporte = transp;
+            opCabecera.carga = carga;
+
+            cambiarPantalla('vista-recepcion');
+        }
+
+        function iniciarCargaManualDirecta() {
+            remitoGlobal = "CARGA-MANUAL";
+            opcionesIA = []; 
+            indiceActualIA = 0;
+            cambiarPantalla('vista-consolidacion');
+            renderizarOpcionesIA();
+        }
 
         function procesarFoto(input) {
             if (!input.files || !input.files[0]) return;
@@ -164,7 +234,7 @@
                     divEstado.style.backgroundColor = '#1e7e34';
                     
                     if (data.orden_compra === "FALTANTE") {
-                        alert("🚨 ATENCIÓN: Este remito NO TIENE Orden de Compra asociada. Alerta enviada a Administración.");
+                        alert("🚨 ATENCIÓN: Este remito NO TIENE Orden de Compra asociada.");
                     } else {
                         alert(`🎯 ¡ÉXITO! Orden de Compra detectada: ${data.orden_compra}`);
                     }
@@ -220,7 +290,6 @@
             renderizarOpcionesIA();
         }
 
-        // EL BUSCADOR MANUAL CON LA CAPACIDAD DE FORZAR EL INGRESO
         function filtrarMaestroManual() {
             const txtSku = document.getElementById('buscar-sku').value.toLowerCase();
             const txtDesc = document.getElementById('buscar-desc').value.toLowerCase();
@@ -259,7 +328,6 @@
                 }
             });
 
-            // LA MAGIA DE RESCATE: Si no encuentra nada, te deja inventar el artículo igual.
             if (encontrados === 0) {
                 const divRescate = document.createElement('div');
                 divRescate.style = "background:#5a1a1a; padding:10px; margin-bottom:5px; border-radius:3px; cursor:pointer; font-size:13px; border-left: 3px solid #ff4444;";
@@ -269,7 +337,6 @@
                     let descForzada = txtDesc.toUpperCase() || "ARTÍCULO FORZADO";
                     articuloSeleccionadoActual = skuForzado;
                     
-                    // Lo metemos al maestro temporal para que no explote
                     maestroArticulos[skuForzado] = { desc: descForzada };
 
                     document.getElementById('contenedor-opciones-ia').innerHTML = `
@@ -309,7 +376,7 @@
                 pallet: contadorPallets
             });
 
-            alert(`✅ Registrado: ${articuloSeleccionadoActual} x ${cantidad} (Asignado al Pallet ${contadorPallets})`);
+            alert(`✅ Registrado: ${articuloSeleccionadoActual} x ${cantidad}`);
             inputCant.value = "";
             actualizarTablaResumen();
         }
@@ -333,7 +400,7 @@
                 alert("⚠️ No podés dejar un pallet vacío.");
                 return;
             }
-            alert(`📦 Pallet N° ${contadorPallets} cerrado. Iniciando Pallet N° ${contadorPallets + 1}.`);
+            alert(`📦 Pallet N° ${contadorPallets} cerrado.`);
             contadorPallets++;
             document.getElementById('num-pallet-actual').innerText = contadorPallets;
         }
@@ -343,10 +410,19 @@
                 alert("❌ No hay mercadería registrada.");
                 return;
             }
-            alert(`🎉 ¡RECEPCIÓN CONCLUIDA!\nTotal: ${mercaderiaConsolidada.length} ítems en ${contadorPallets} pallets.`);
+            alert(`🎉 ¡RECEPCIÓN CONCLUIDA!\nResponsable: ${opCabecera.responsable}\nTransporte: ${opCabecera.transporte}\nTotal: ${mercaderiaConsolidada.length} ítems en ${contadorPallets} pallets.`);
+            
+            // Limpieza de variables para el siguiente camión
             mercaderiaConsolidada = [];
             contadorPallets = 1;
             document.getElementById('num-pallet-actual').innerText = contadorPallets;
+            
+            // Limpiamos los inputs de cabecera
+            document.getElementById('input-responsable').value = "";
+            document.getElementById('input-ayudantes').value = "";
+            document.getElementById('select-transporte').value = "";
+            document.getElementById('select-carga').value = "";
+
             actualizarTablaResumen();
             volverAlMenu();
         }
