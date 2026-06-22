@@ -259,3 +259,84 @@
                         document.getElementById('contenedor-opciones-ia').innerHTML = `
                             <div class="card-articulo" style="border-left-color: #ffc107; background-color: #3a321d;">
                                 <div>
+                                    <div class="sku" style="color:#ffc107;">${sku}</div>
+                                    <div class="desc">${maestroArticulos[sku].desc}</div>
+                                </div>
+                                <div class="cant-stock" style="color:#ffc107;">✍️ MANUAL</div>
+                            </div>
+                        `;
+                        contenedorResultados.innerHTML = "";
+                        document.getElementById('buscar-sku').value = "";
+                        document.getElementById('buscar-desc').value = "";
+                    };
+                    contenedorResultados.appendChild(divRes);
+                }
+            });
+        }
+
+        // Lógica de agregado y tablas
+        function agregarItemAlListado() {
+            const inputCant = document.getElementById('cantidad-recibida');
+            const cantidad = parseInt(inputCant.value);
+
+            if (!articuloSeleccionadoActual) {
+                alert("❌ Seleccione un artículo antes de continuar.");
+                return;
+            }
+            if (isNaN(cantidad) || cantidad <= 0) {
+                alert("❌ Ingrese una cantidad válida.");
+                return;
+            }
+
+            mercaderiaConsolidada.push({
+                sku: articuloSeleccionadoActual,
+                descripcion: maestroArticulos[articuloSeleccionadoActual].desc,
+                cant: cantidad,
+                pallet: contadorPallets
+            });
+
+            alert(`✅ Registrado: ${articuloSeleccionadoActual} x ${cantidad} (Asignado al Pallet ${contadorPallets})`);
+            inputCant.value = "";
+            actualizarTablaResumen();
+        }
+
+        function actualizarTablaResumen() {
+            const tbody = document.getElementById('tabla-items-recibidos');
+            tbody.innerHTML = "";
+            mercaderiaConsolidada.forEach(item => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td><strong>${item.sku}</strong><br><span style="font-size:11px; color:#aaa;">${item.descripcion}</span></td>
+                    <td><span style="color:#28a745; font-weight:bold;">${item.cant}</span></td>
+                    <td><span class="badge-pallet">PALLET ${item.pallet}</span></td>
+                `;
+                tbody.appendChild(fila);
+            });
+        }
+
+        // Cierre de pallets
+        function cerrarPalletYFirma() {
+            if (mercaderiaConsolidada.filter(i => i.pallet === contadorPallets).length === 0) {
+                alert("⚠️ No podés dejar un pallet vacío.");
+                return;
+            }
+            alert(`📦 Pallet N° ${contadorPallets} cerrado. Iniciando Pallet N° ${contadorPallets + 1}.`);
+            contadorPallets++;
+            document.getElementById('num-pallet-actual').innerText = contadorPallets;
+        }
+
+        function finalizarCargaEntera() {
+            if (mercaderiaConsolidada.length === 0) {
+                alert("❌ No hay mercadería registrada.");
+                return;
+            }
+            alert(`🎉 ¡RECEPCIÓN CONCLUIDA!\nTotal: ${mercaderiaConsolidada.length} ítems en ${contadorPallets} pallets.\nDatos consolidados.`);
+            mercaderiaConsolidada = [];
+            contadorPallets = 1;
+            document.getElementById('num-pallet-actual').innerText = contadorPallets;
+            actualizarTablaResumen();
+            volverAlMenu();
+        }
+    </script>
+</body>
+</html>
