@@ -26,7 +26,7 @@
         .panel { background-color: var(--bg-panel); border: 1px solid var(--border-color); padding: 15px; border-radius: 5px; margin-bottom: 15px; }
         .panel-titulo { font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
         
-        /* BOTONES EMBLEMA */
+        /* BOTONES DE INTERFAZ */
         .btn-gigante-inicio { background-color: var(--btn-green); color: white; width: 100%; height: 250px; font-size: 24px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; text-transform: uppercase; }
         .btn-verde { background-color: var(--btn-green); color: white; width: 100%; padding: 18px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
         .btn-gris { background-color: var(--btn-edit); color: white; width: 100%; padding: 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
@@ -40,30 +40,30 @@
         .slider { -webkit-appearance: none; width: 100%; height: 6px; background: var(--border-color); outline: none; margin: 0 10px; flex-grow: 1; }
         .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--btn-slate); border: 2px solid var(--text-muted); cursor: pointer; }
 
-        /* FILAS DE SELECCIÓN */
+        /* LISTADOS DE ITEMS */
         .fila-item { background-color: var(--bg-main); border-left: 4px solid var(--btn-slate); padding: 12px; margin-bottom: 8px; border-radius: 0 4px 4px 0; cursor: pointer; }
         .sku-title { font-weight: bold; color: var(--text-main); font-size: 15px; }
         .sku-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
         
-        /* OVERLAYS MODALES */
+        /* MODALES */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 15px; box-sizing: border-box; }
         .modal-box { background: var(--bg-panel); padding: 20px; border-radius: 8px; width: 100%; max-width: 400px; border: 1px solid var(--border-color); }
         .datos-fijos { background-color: var(--bg-main); padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid var(--btn-edit); line-height: 1.4; }
         label.etiqueta { font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
 
-        /* ESTILOS DE IMPRESIÓN DEL CARTEL (OCULTO EN PANTALLA) */
+        /* ESTILOS DE IMPRESIÓN DEL CARTEL (A4) */
         @media print {
             body * { visibility: hidden; }
             #seccion-impresion-pallet, #seccion-impresion-pallet * { visibility: visible; }
-            #seccion-impresion-pallet { position: absolute; left: 0; top: 0; width: 210mm; height: 297mm; background: white; color: black; padding: 10mm; box-sizing: border-box; display: block !important; }
+            #seccion-impresion-pallet { position: absolute; left: 0; top: 0; width: 210mm; height: 297mm; background: white; color: black; padding: 5mm; box-sizing: border-box; display: block !important; }
             .print-header { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-family: Arial, sans-serif; }
-            .print-badge-pallet { background-color: black; color: white; font-size: 26pt; font-weight: bold; text-align: center; padding: 8px; width: 100%; display: block; font-family: sans-serif; }
+            .print-badge-pallet { background-color: black; color: white; font-size: 26pt; font-weight: bold; text-align: center; padding: 8px; width: 100%; display: block; margin-top: 5px; font-family: sans-serif; }
             .print-slot-table { width: 100%; border-collapse: collapse; border: 3px solid black; margin-bottom: 10px; height: 68mm; font-family: Arial, sans-serif; }
-            .print-sku-line { font-size: 50pt; font-weight: 900; font-family: 'Arial Black', sans-serif; line-height: 1.1; display: block; width: 100%; border-bottom: none; }
+            .print-sku-line { font-size: 50pt; font-weight: 900; font-family: 'Arial Black', sans-serif; line-height: 1.1; display: block; width: 100%; border-bottom: 2px solid black; padding-bottom: 4px; }
             .print-qty-line { font-size: 28pt; font-weight: bold; font-family: 'Arial Black', sans-serif; display: block; margin-top: 5px; }
             .print-desc-line { font-size: 14pt; font-weight: bold; color: #222; margin-top: 8px; display: block; line-height: 1.2; }
-            .print-qr-zone { width: 32mm; height: 32mm; border: 1px solid transparent; text-align: center; vertical-align: middle; padding: 2px; }
-            .print-qr-global { width: 45mm; height: 45mm; border: 2px solid black; }
+            .print-qr-zone { width: 32mm; height: 32mm; text-align: center; vertical-align: middle; padding: 2px; }
+            .print-qr-global { width: 40mm; height: 40mm; border: 2px solid black; }
         }
     </style>
 </head>
@@ -72,7 +72,7 @@
     <div id="pantalla-1">
         <div class="header">SISTEMA WMS STOCK FLOW</div>
         <div style="display: flex; height: 70vh; align-items: center; justify-content: center;">
-            <button class="btn-gigante-inicio" onclick="iniciarRecepcion()">📥 COMENZAR RECEPCIÓN</button>
+            <button class="btn-gigante-inicio" id="btn-comenzar-recepcion" onclick="iniciarRecepcion()">📥 COMENZAR RECEPCIÓN</button>
         </div>
     </div>
 
@@ -202,7 +202,7 @@
     <div id="modal-faltantes" class="overlay">
         <div class="modal-box" style="border-color: var(--color-danger);">
             <div class="panel-titulo" style="color: var(--color-danger);">⚠️ ALERTA DE RECEPCIÓN PARCIAL</div>
-            <p style="font-size:14px;">Estás por cerrar el camión, pero se detectaron diferencias:</p>
+            <p style="font-size:14px;">Se detectaron diferencias con la Orden de Compra:</p>
             <ul id="lista-errores-cierre" style="color:var(--color-danger); font-size:13px; padding-left:20px; margin: 10px 0;"></ul>
             <div style="display:flex; gap:10px;">
                 <button class="btn-gris" onclick="cerrarModal('modal-faltantes')">🔙 REVISAR</button>
@@ -214,9 +214,13 @@
     <div id="seccion-impresion-pallet" style="display:none;"></div>
 
     <script>
-        let timer = null, segundosT = 0, isManualMode = false, archivoFotoTemp = null;
+        // VARIABLES GLOBALES DE OPERACIÓN
+        let timer = null;
+        let segundosT = 0;
+        let isManualMode = false;
         let datosOperacion = { prov: "", remito: "", oc: "1234" };
-        let palletActivo = 1, pallets = [{ id: 1, items: [] }];
+        let palletActivo = 1;
+        let pallets = [{ id: 1, items: [] }];
         
         let maestroArticulos = {
             "JU-PACMET14": "SET DE PINTURA ACRÍLICA PROFESIONAL - 12 COLORES - ALTA OPACIDAD",
@@ -225,23 +229,34 @@
         let listaEsperada = [];
         let itemSeleccionado = null;
 
+        // CORRECCIÓN CRÍTICA: FUNCIÓN DE INICIO REESTRUCTURADA SIN INTERFERENCIAS
         function iniciarRecepcion() {
-            if(!timer) {
-                timer = setInterval(() => {
-                    segundosT++;
-                    let m = String(Math.floor(segundosT / 60)).padStart(2, '0');
-                    let s = String(segundosT % 60).padStart(2, '0');
-                    let text = `⏱️ ${m}:${s}`;
-                    document.getElementById('reloj-p2').innerText = text;
-                    document.getElementById('reloj-p3').innerText = text;
-                    document.getElementById('reloj-p4').innerText = text;
-                }, 1000);
-            }
+            segundosT = 0;
+            if (timer) { clearInterval(timer); timer = null; }
+            
+            timer = setInterval(function() {
+                segundosT++;
+                let m = String(Math.floor(segundosT / 60)).padStart(2, '0');
+                let s = String(segundosT % 60).padStart(2, '0');
+                let formattedTime = `⏱️ ${m}:${s}`;
+                
+                let r2 = document.getElementById('reloj-p2');
+                let r3 = document.getElementById('reloj-p3');
+                let r4 = document.getElementById('reloj-p4');
+                
+                if(r2) r2.innerText = formattedTime;
+                if(r3) r3.innerText = formattedTime;
+                if(r4) r4.innerText = formattedTime;
+            }, 1000);
+            
             cambiarPantalla('pantalla-2');
         }
 
         function cambiarPantalla(id) {
-            ['pantalla-1', 'pantalla-2', 'pantalla-3', 'pantalla-4'].forEach(p => document.getElementById(p).style.style.display = 'none');
+            document.getElementById('pantalla-1').style.display = 'none';
+            document.getElementById('pantalla-2').style.display = 'none';
+            document.getElementById('pantalla-3').style.display = 'none';
+            document.getElementById('pantalla-4').style.display = 'none';
             document.getElementById(id).style.display = 'block';
         }
 
@@ -254,7 +269,7 @@
         function cambiarSlidePallets(delta) {
             let s = document.getElementById('slide-pallets');
             let v = parseInt(s.value) + delta;
-            if(v>=1 && v<=70) { s.value = v; document.getElementById('valor-pallets').innerText = v; }
+            if(v >= 1 && v <= 70) { s.value = v; document.getElementById('valor-pallets').innerText = v; }
         }
 
         function seleccionarBtn(btn) {
@@ -269,7 +284,6 @@
 
         function procesarFoto(input) {
             if(!input.files[0]) return;
-            archivoFotoTemp = input.files[0];
             document.getElementById('input-prov-ia').value = "DISTRIBUIDORA GLOBAL S.A.";
             document.getElementById('input-rem-ia').value = "04-23546";
             document.getElementById('modal-validar-ia').style.display = 'flex';
@@ -454,26 +468,24 @@
             clearInterval(timer);
             cerrarModal('modal-faltantes');
             
-            // 1. DISPARAR GMAIL CON FORMATO ESTRICTO
+            // 1. DISPARAR GMAIL CON FORMATO ESTRICTO DE RECEPCIÓN
             let itemsTexto = "";
             listaEsperada.forEach(i => {
                 let totRec = i.totalReq - i.pend;
                 itemsTexto += `• SKU: ${i.sku} -> Total: ${totRec} u.\n`;
             });
-            let mailBody = `Se recibió bajo la siguiente OC / el siguiente remito:\n\n${itemsTexto}\nGracias.\nRecepción.`;
+            let mailBody = `Se recibió bajo la Gifts OC / el siguiente remito:\n\n${itemsTexto}\nGracias.\nRecepción.`;
             let mailtoUrl = `mailto:marcosdiaz@rqemprendimientos.com.ar?subject=${encodeURIComponent('OC N° ' + datosOperacion.oc + ' / Remito N° ' + datosOperacion.remito)}&body=${encodeURIComponent(mailBody)}`;
             
-            // 2. CONSTRUIR E INYECTAR CARTEL DE IMPRESIÓN DINÁMICO (FORMATO IMAGEN 3)
+            // 2. CONSTRUIR E INYECTAR CARTEL DINÁMICO CON FORMATO IDÉNTICO SOLICITADO
             let printArea = document.getElementById('seccion-impresion-pallet');
-            printArea.innerHTML = ""; // Limpiar
+            printArea.innerHTML = ""; 
             
             pallets.forEach(p => {
                 if(p.items.length === 0) return;
                 
-                // Generador de estructura html del cartel por pallet
                 let slotsHtml = "";
-                // Renderizar hasta 3 slots por hoja A4
-                for(let idx=0; idx<3; idx++) {
+                for(let idx = 0; idx < 3; idx++) {
                     let item = p.items[idx];
                     if(item) {
                         slotsHtml += `
@@ -491,21 +503,26 @@
                             </tr>
                         </table>`;
                     } else {
-                        slotsHtml += `<table class="print-slot-table" style="border-style:dashed; border-color:#ccc;"><tr><td style="text-align:center;color:#ccc;font-size:20pt;font-weight:bold;">SLOT DISPONIBLE</td></tr></table>`;
+                        slotsHtml += `
+                        <table class="print-slot-table" style="border-style:dashed; border-color:#ccc;">
+                            <tr>
+                                <td style="text-align:center; color:#ccc; font-size:20pt; font-weight:bold; vertical-align:middle;">SLOT DISPONIBLE</td>
+                            </tr>
+                        </table>`;
                     }
                 }
 
                 printArea.innerHTML += `
-                <div class="hoja-pallet-print" style="page-break-after: always;">
+                <div class="hoja-pallet-print" style="page-break-after: always; background:white; color:black; padding:5mm; box-sizing:border-box;">
                     <table class="print-header">
                         <tr>
-                            <td style="vertical-align:middle; font-size:10pt; font-weight:bold;">
-                                WMS STOCK FLOW - PROV: ${datosOperacion.prov.toUpperCase()}
+                            <td style="vertical-align:middle; font-size:10pt; font-weight:bold; font-family:sans-serif;">
+                                WMS STOCK FLOW - PROV: DISTRIBUIDORA GLOBAL S.A.
                                 <div class="print-badge-pallet">PALLET N° ${p.id}</div>
                             </td>
-                            <td style="width:45mm; text-align:right;">
-                                <div class="print-qr-global" style="background:#000; margin-left:auto;"></div>
-                                <div style="font-size:8pt; font-weight:bold; text-align:center; width:45mm; margin-left:auto;">GLOBAL</div>
+                            <td style="width:45mm; text-align:right; vertical-align:middle;">
+                                <div class="print-qr-global" style="width:40mm; height:40mm; background:#000; margin-left:auto;"></div>
+                                <div style="font-size:8pt; font-weight:bold; text-align:center; width:40mm; margin-left:auto;">GLOBAL</div>
                             </td>
                         </tr>
                     </table>
@@ -513,12 +530,13 @@
                 </div>`;
             });
 
-            // Abrir mail y ventana de impresión
             window.location.href = mailtoUrl;
             setTimeout(() => { window.print(); }, 800);
             
-            // RESET OPERATIVO
-            segundosT = 0; pallets = [{ id: 1, items: [] }]; palletActivo = 1;
+            // RESET Y REGRESO A ORIGEN
+            segundosT = 0; 
+            pallets = [{ id: 1, items: [] }]; 
+            palletActivo = 1;
             cambiarPantalla('pantalla-1');
         }
 
